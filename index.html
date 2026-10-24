@@ -44,13 +44,13 @@
       <input type="search" id="q" placeholder="搜索动物名称或代码，如 蓝羊 / blue_sheep" autocomplete="off" data-i18n-ph="phSearch">
     </div>
     <div class="filters">
-      <label data-i18n="lblFamily">类别
+      <label><span data-i18n="lblFamily">动物类别</span>
         <select id="fFamily"><option value="">全部</option></select>
       </label>
-      <label data-i18n="lblMap">地图
+      <label><span data-i18n="lblMap">地图</span>
         <select id="fMap"><option value="">全部</option></select>
       </label>
-      <label data-i18n="lblRarity">稀有度
+      <label><span data-i18n="lblRarity">稀有度</span>
         <select id="fRarity">
           <option value="" data-i18n="optRareAll">全部稀有以上</option>
           <option value="rare" data-i18n="optRare">仅含稀有</option>
@@ -58,7 +58,10 @@
           <option value="go" data-i18n="optGo">仅含传奇（GO）</option>
         </select>
       </label>
-      <label data-i18n="lblSort">排序
+      <label><span data-i18n="lblClass">动物等级</span>
+        <select id="fClass"><option value="">全部</option></select>
+      </label>
+      <label><span data-i18n="lblSort">排序</span>
         <select id="fSort">
           <option value="family" data-i18n="optSortFamily">类别 · 名称</option>
           <option value="name" data-i18n="optSortName">名称</option>
@@ -67,6 +70,7 @@
       </label>
       <button type="button" id="btnReset" class="btn-reset" data-i18n="btnReset">重置</button>
     </div>
+    <p class="filter-help" data-i18n="filterHelp">各项可独立筛选，同时选择取交集；动物等级不是难度或奖牌。</p>
   </div>
 </section>
 
@@ -118,11 +122,13 @@
 <footer class="foot">
   <div class="foot-inner">
     <p data-i18n="footSrc">数据源：gameslikefinder《Rare Fur Types List》（2026-06-24，20 张地图）· thewildregister.com / TacMaps（骆马）· Matt 底座蓝图来自 thehuntercotw.wordpress.com（2025-07-06）。</p>
+    <p data-i18n="footClasses">Animal types follow the four Trophy Manager groups. Animal Class uses public reference data, not trophy difficulty or medals; unresolved records remain unverified.</p>
     <p data-i18n="footNote">Blue sheep &amp; Bengal tiger rarities corrected against live in-game variant data (read 2026-10-24); live data wins over third-party articles. Available online via GitHub Pages; the local copy can also be opened through index.html with its accompanying files.</p>
   </div>
 </footer>
 
 <script src="data.js"></script>
+<script src="game-filters.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

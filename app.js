@@ -3,6 +3,12 @@
   "use strict";
   var data = window.ANIMALS || [];
   var LANG = "en";
+  var game = window.GAME_FILTERS || {groups:{},animals:{}};
+  var GROUP_ORDER = ["birds","mammals","reptiles","other"];
+  function infoOf(a){return game.animals[a.code] || {group:null,animalClass:null,classStatus:"unverified",sources:[]};}
+  function groupOf(a){return infoOf(a).group;}
+  function classOf(a){return infoOf(a).animalClass;}
+  function classText(a){return classOf(a)==null?T("classUnknown"):(LANG==="en"?"Class "+classOf(a):classOf(a)+" 级");}
 
   /* ---- 双语字典 ---- */
   var I18N = {
@@ -13,7 +19,7 @@
     lgGo: { en: "Has Great One fur", zh: "有 Great One 传奇毛色" },
     tabAnimals: { en: "Species", zh: "动物图鉴" },
     tabMounts: { en: "Mounts", zh: "底座总览" },
-    lblFamily: { en: "Family", zh: "类别" },
+    lblFamily: { en: "Animal type", zh: "动物类别" },
     lblMap: { en: "Reserve", zh: "地图" },
     lblRarity: { en: "Rarity", zh: "稀有度" },
     lblSort: { en: "Sort", zh: "排序" },
@@ -22,23 +28,23 @@
     optRare: { en: "Rare only", zh: "仅含稀有" },
     optVeryrare: { en: "Very rare only", zh: "仅含极稀有" },
     optGo: { en: "Great One only", zh: "仅含传奇（GO）" },
-    optSortFamily: { en: "Family · Name", zh: "类别 · 名称" },
+    optSortFamily: { en: "Type · Name", zh: "类别 · 名称" },
     optSortName: { en: "Name", zh: "名称" },
     optSortCount: { en: "Rare count", zh: "稀有毛色数" },
     btnReset: { en: "Reset", zh: "重置" },
     phSearch: { en: "Search species or code, e.g. blue_sheep", zh: "搜索动物名称或代码，如 蓝羊 / blue_sheep" },
-    ptFamilies: { en: "Families", zh: "类别概览" },
+    ptFamilies: { en: "Animal types", zh: "动物类别" },
     ptMaps: { en: "Reserves", zh: "地图分布" },
     ptMounts: { en: "Matt Mount Quick Look", zh: "Matt 底座速查" },
     lblAnimals: { en: "Animals", zh: "动物" },
     listHint: { en: "Click a row to expand furs / maps / mounts", zh: "点击行展开毛色 / 地图 / 底座详情" },
     empty1: { en: "No species match the filters.", zh: "没有符合条件的物种。" },
-    empty2: { en: "Try loosening family, reserve or rarity filters.", zh: "试试放宽类别、地图或稀有度筛选。" },
+    empty2: { en: "Try loosening animal type, class, reserve or rarity filters.", zh: "试试放宽动物类别、等级、地图或稀有度筛选。" },
     ptMountCatalog: { en: "All Matt Mount Blueprints", zh: "Matt 底座总览" },
     phMounts: { en: "Search mount name, e.g. Duck Out", zh: "搜索底座名，如 Duck Out" },
     mcHint: { en: "Aggregated by mount — every blueprint and its supported species; click a species to jump back to the catalog.", zh: "按底座聚合，展示每个多功能底座支持的动物；点击动物标签可跳转到动物图鉴并定位该物种。" },
     stSpecies: { en: "Species", zh: "物种总数" },
-    stFamilies: { en: "Families", zh: "动物类别" },
+    stFamilies: { en: "Animal types", zh: "动物类别" },
     stMaps: { en: "Reserves", zh: "地图" },
     stRareEntries: { en: "Rare fur entries", zh: "稀有以上毛色条目" },
     stGOSpecies: { en: "Species w/ Great One", zh: "有传奇毛色的物种" },
@@ -62,6 +68,8 @@
     mapsSuffix: { en: "maps", zh: "图" },
     mcCountTpl: { en: "mounts ·", zh: "个底座 ·" },
     mcCountSp: { en: "species", zh: "种支持" },
+    lblClass:{en:"Animal Class",zh:"动物等级"},classUnknown:{en:"Class unverified",zh:"等级待核实"},classConflict:{en:"Class sources disagree; unverified",zh:"等级来源冲突，待核实"},filterHelp:{en:"Independent filters; selections combine with AND. Animal Class is not difficulty or a medal.",zh:"各项可独立筛选，同时选择取交集；动物等级不是难度或奖牌。"},noGroup:{en:"No species in the current catalog",zh:"当前图鉴暂无该类物种"},classSources:{en:"Class sources",zh:"等级来源"},
+    footClasses: {en:"Animal types follow the four Trophy Manager groups. Animal Class uses public references (The Wild Register / TacMaps and CoTW Guide), not difficulty or medals; unresolved entries stay unverified.",zh:"动物类别对齐战利品管理器四大类。动物等级来自 The Wild Register / TacMaps、CoTW Guide 公共参考，不是难度或奖牌；缺少依据及冲突条目保留待核实。"},
     footSrc: { en: "Sources: gameslikefinder Rare Fur Types List (2026-06-24, 20 reserves) · thewildregister.com / TacMaps (vicuña) · Matt mount blueprints from thehuntercotw.wordpress.com (2025-07-06).", zh: "数据源：gameslikefinder《Rare Fur Types List》（2026-06-24，20 张地图）· thewildregister.com / TacMaps（骆马）· Matt 底座蓝图来自 thehuntercotw.wordpress.com（2025-07-06）。" },
     footNote: { en: "Blue sheep & Bengal tiger rarities corrected against live in-game variant data (read 2026-10-24); live data wins over third-party articles. Available online via GitHub Pages; the local copy can also be opened through index.html with its accompanying files.", zh: "蓝羊、孟加拉虎稀有度已按实机变体数组（2026-10-24 游戏运行中读取）修正，与第三方文章有出入处以实机为准。已通过 GitHub Pages 在线发布；本地副本保留配套文件后，也可双击 index.html 打开。" }
   };
@@ -162,7 +170,8 @@
     return e ? (e[LANG] != null ? e[LANG] : e.zh) : k;
   }
   function nameOf(a) { return LANG === "en" ? (EN_SPECIES[a.code] || a.code) : a.zh; }
-  function familyOf(a) { return LANG === "en" ? (EN_FAMILY[a.family] || a.family) : a.family; }
+  function familyOf(a) { var g=game.groups[groupOf(a)];return g?g[LANG]:T("noGroup"); }
+  function groupLabel(key){var g=game.groups[key];return g?g[LANG]:key;}
   function mapBase(m) { return LANG === "en" ? (EN_MAP[m] || m) : m; }
   function mapDisplay(m) {
     if (LANG === "en") return mapBase(m) + (EN_MAP_SUFFIX[m] || "");
@@ -181,7 +190,7 @@
   };
 
   var state = {
-    q: "", family: "", map: "", rarity: "", sort: "family",
+    q: "", family: "", map: "", rarity: "", animalClass:"", sort: "family",
     open: {}
   };
 
@@ -190,6 +199,7 @@
     q: document.getElementById("q"),
     fFamily: document.getElementById("fFamily"),
     fMap: document.getElementById("fMap"),
+    fClass: document.getElementById("fClass"),
     fRarity: document.getElementById("fRarity"),
     fSort: document.getElementById("fSort"),
     btnReset: document.getElementById("btnReset"),
@@ -217,14 +227,14 @@
 
   function mapsOf(a) { return a.maps; }
 
-  function allFamilies() { return unique(data.map(function (a) { return a.family; })).sort(); }
+  function allFamilies() { return GROUP_ORDER; }
   function allMaps() { return unique(data.reduce(function (acc, a) { return acc.concat(mapsOf(a)); }, [])).sort(); }
 
   /* 每动物预建搜索文本：中/英文名、代码、类别、地图 + 地图俗称 */
   var hayCache = {};
   function searchHay(a) {
     if (hayCache[a.code] && hayCache[a.code].l === LANG) return hayCache[a.code].s;
-    var parts = [a.zh, (EN_SPECIES[a.code] || ""), a.code, a.family, (EN_FAMILY[a.family] || "")].concat(a.maps);
+    var parts = [a.zh, (EN_SPECIES[a.code] || ""), a.code, familyOf(a), a.family, (EN_FAMILY[a.family] || "")].concat(a.maps);
     a.maps.forEach(function (m) {
       if (EN_MAP[m]) parts.push(EN_MAP[m]);
       if (MAP_WORDS[m]) parts = parts.concat(MAP_WORDS[m]);
@@ -241,7 +251,7 @@
     el.fFamily.innerHTML = '<option value="">' + esc(T("optAll")) + '</option>';
     allFamilies().forEach(function (f) {
       var o = document.createElement("option");
-      o.value = f; o.textContent = familyOf({ family: f });
+      o.value = f; o.textContent = groupLabel(f);
       el.fFamily.appendChild(o);
     });
     el.fMap.innerHTML = '<option value="">' + esc(T("optAll")) + '</option>';
@@ -250,6 +260,7 @@
       o.value = m; o.textContent = mapDisplay(m);
       el.fMap.appendChild(o);
     });
+    el.fClass.innerHTML = '<option value="">'+esc(T("optAll"))+'</option>'+Array.from({length:9},function(_,i){return '<option value="'+(i+1)+'">'+(LANG==="en"?"Class "+(i+1):(i+1)+" 级")+'</option>';}).join("")+'<option value="unknown">'+esc(T("classUnknown"))+'</option>';el.fClass.value=state.animalClass;
     el.fFamily.value = state.family;
     el.fMap.value = state.map;
   }
@@ -257,7 +268,8 @@
   function hasGO(a) { return /传奇毛色/.test(a.note || ""); }
 
   function matches(a) {
-    if (state.family && a.family !== state.family) return false;
+    if (state.family && groupOf(a) !== state.family) return false;
+    if(state.animalClass && (state.animalClass==="unknown"?classOf(a)!=null:String(classOf(a))!==state.animalClass))return false;
     if (state.map && a.maps.indexOf(state.map) < 0) return false;
     if (state.rarity === "rare" && !a.rare.some(function (r) { return r[1] === "稀有"; })) return false;
     if (state.rarity === "veryrare" && !a.rare.some(function (r) { return r[1] === "极稀有"; })) return false;
@@ -270,7 +282,7 @@
     var nm = nameOf(a);
     if (state.sort === "name") return [nm];
     if (state.sort === "rareCount") return [-a.rare.length, nm];
-    return [a.family, nm];
+    return [GROUP_ORDER.indexOf(groupOf(a)), nm];
   }
 
   function filtered() {
@@ -293,7 +305,7 @@
     });
     var items = [
       [data.length, T("stSpecies")],
-      [unique(data.map(function (a) { return a.family; })).length, T("stFamilies")],
+      [GROUP_ORDER.length, T("stFamilies")],
       [allMaps().length, T("stMaps")],
       [rareCount, T("stRareEntries")],
       [goCount, T("stGOSpecies")]
@@ -326,7 +338,7 @@
       var pct = total ? Math.round(e[1] / total * 100) : 0;
       var cls = e[0] === active ? "bar active" : "bar";
       var label = labelFn(e[0]);
-      return '<div class="' + cls + '" data-key="' + escAttr(e[0]) + '">' +
+      return '<div class="' + cls + '" role="button" tabindex="0" aria-pressed="'+(e[0]===active?'true':'false')+'" data-key="' + escAttr(e[0]) + '">' +
         '<span class="name" title="' + escAttr(label) + '">' + esc(label) + '</span>' +
         '<span class="track"><span class="fill" style="width:' + pct + '%"></span></span>' +
         '<span class="num">' + e[1] + '</span></div>';
@@ -334,13 +346,14 @@
     container.innerHTML = html;
     Array.prototype.forEach.call(container.querySelectorAll(".bar"), function (b) {
       b.addEventListener("click", function () { onPick(b.getAttribute("data-key")); });
+      b.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();onPick(b.getAttribute("data-key"));}});
     });
   }
 
   function familyCounts() {
     var map = {};
-    data.forEach(function (a) { map[a.family] = (map[a.family] || 0) + 1; });
-    return Object.keys(map).sort().map(function (k) { return [k, map[k]]; });
+    data.forEach(function (a) { var k=groupOf(a);map[k] = (map[k] || 0) + 1; });
+    return GROUP_ORDER.map(function (k) { return [k, map[k] || 0]; });
   }
   function mapCounts() {
     var map = {};
@@ -357,7 +370,7 @@
       state.family = state.family === k ? "" : k;
       el.fFamily.value = state.family;
       apply();
-    }, function (k) { return familyOf({ family: k }); });
+    }, groupLabel);
     renderBars(el.mapBars, mapCounts(), total, state.map, function (k) {
       state.map = state.map === k ? "" : k;
       el.fMap.value = state.map;
@@ -378,9 +391,7 @@
     var onMap = list.filter(function (a) { return a.mounts.length; });
     var noMount = list.filter(function (a) { return !a.mounts.length; });
     if (!onMap.length) {
-      el.mountList.innerHTML =
-        '<p class="mount-hint">' + T("mHintEmpty1") + '</p>' +
-        '<p class="mount-hint">' + noMount.length + ' ' + T("mHintEmpty2") + '</p>';
+      el.mountList.textContent = LANG==="en"?"No mount blueprints among the current filtered species.":"当前筛选结果中没有关联底座的物种。";
       return;
     }
     var html = '<p class="mount-hint">' + mapDisplay(state.map) + ' · ' + onMap.length + ' ' + T("mHintList1") + '</p>' +
@@ -432,7 +443,7 @@
         var code = btn.getAttribute("data-code");
         var a = data.find(function (x) { return x.code === code; });
         if (a) {
-          state.q = a.zh;
+          state.q = a.zh;state.family="";state.map="";state.rarity="";state.animalClass="";el.fFamily.value="";el.fMap.value="";el.fRarity.value="";el.fClass.value="";
           el.q.value = a.zh;
           setView("animals");
           apply();
@@ -471,6 +482,7 @@
       var mountChips = a.mounts.map(function (m) {
         return '<span class="mount-chip">' + esc(m[0]) + (m[1] ? '<span class="size-chip">' + esc(m[1]) + "</span>" : "") + "</span>";
       }).join("");
+      var classEvidence=infoOf(a).sources.map(function(url){return '<a href="'+escAttr(url)+'" target="_blank" rel="noopener noreferrer">'+esc(new URL(url).hostname)+'</a>';}).join(" / ");
       var detailMount = mountChips || '<span style="color:rgba(30,43,36,0.45);font-size:12px">' + esc(T("noMountDetail")) + '</span>';
       var rareLis = a.rare.map(function (r) {
         return '<li>' + '<span class="grade grade-' + (r[1] === "极稀有" ? "vr" : "r") + '">' + esc(gradeName(r[1])) + "</span>" + esc(furName(r[0])) + "</li>";
@@ -491,6 +503,7 @@
           '<span class="main"><span class="zh">' + esc(nameOf(a)) + (hasGO(a) ? '<span class="go-mark">GO</span>' : "") + "</span>" +
           '<span class="code">' + esc(a.code) + "</span></span>" +
           '<span class="meta">' +
+            '<span class="chip class-chip">'+esc(classText(a))+'</span>'+
             '<span class="chip">' + esc(a.maps.length) + " " + esc(T("mapsSuffix")) + "</span>" +
             rowMount +
             '<span class="dots">' + dots + "</span>" +
@@ -504,6 +517,7 @@
             "<div><h3>" + esc(T("dMounts")) + "</h3>" + detailMount + "</div>" +
           "</div>" +
           (a.note ? '<p class="note">' + esc(a.note) + "</p>" : "") +
+          '<p class="note">'+esc(infoOf(a).classStatus==="conflict"?T("classConflict"):classText(a))+(classEvidence?" · "+esc(T("classSources"))+": "+classEvidence:"")+"</p>" +
         "</div>" +
       "</div>";
     }).join("");
@@ -523,7 +537,7 @@
   function updateStatic() {
     Array.prototype.forEach.call(document.querySelectorAll("[data-i18n]"), function (n) {
       var k = n.getAttribute("data-i18n");
-      if (I18N[k]) n.innerHTML = T(k);
+      if (I18N[k]) n.textContent=T(k);
     });
     Array.prototype.forEach.call(document.querySelectorAll("[data-i18n-ph]"), function (n) {
       var k = n.getAttribute("data-i18n-ph");
@@ -558,11 +572,12 @@
     el.q.addEventListener("input", function () { state.q = el.q.value.trim(); apply(); });
     el.fFamily.addEventListener("change", function () { state.family = el.fFamily.value; apply(); });
     el.fMap.addEventListener("change", function () { state.map = el.fMap.value; apply(); });
+    el.fClass.addEventListener("change",function(){state.animalClass=el.fClass.value;apply();});
     el.fRarity.addEventListener("change", function () { state.rarity = el.fRarity.value; apply(); });
     el.fSort.addEventListener("change", function () { state.sort = el.fSort.value; apply(); });
     el.btnReset.addEventListener("click", function () {
-      state = { q: "", family: "", map: "", rarity: "", sort: "family", open: {} };
-      el.q.value = ""; el.fFamily.value = ""; el.fMap.value = ""; el.fRarity.value = ""; el.fSort.value = "family";
+      state = { q: "", family: "", map: "", rarity: "", animalClass:"", sort: "family", open: {} };
+      el.q.value = ""; el.fFamily.value = ""; el.fMap.value = ""; el.fRarity.value = ""; el.fSort.value = "family";el.fClass.value="";
       apply();
     });
     el.btnLang.addEventListener("click", function () {
