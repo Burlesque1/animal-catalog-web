@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>猎人：荒野的呼唤 · 全物种稀有毛色图鉴</title>
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ===== Hero ===== -->
+<header class="hero">
+  <div class="hero-bg" role="img" aria-label="秋日森林中的小鹿，游戏宣传画面"></div>
+  <div class="hero-inner">
+    <p class="hero-eyebrow">theHunter: Call of the Wild</p>
+    <h1 class="hero-title">全物种稀有毛色图鉴</h1>
+    <p class="hero-sub">127 种动物 · 稀有毛色 · 地图分布 · Matt 底座蓝图 —— 一站查清值得打的每一只</p>
+    <div class="hero-stats" id="heroStats"></div>
+    <div class="hero-legend" aria-label="毛色图例">
+      <span class="hlg"><i class="dot dot-rare"></i>稀有毛色（0.1%–1%）</span>
+      <span class="hlg"><i class="dot dot-veryrare"></i>极稀有毛色（&lt;0.1%）</span>
+      <span class="hlg"><i class="dot dot-go"></i>有 Great One 传奇毛色</span>
+    </div>
+  </div>
+</header>
+
+<!-- ===== 视图页签 ===== -->
+<nav class="view-tabs" aria-label="视图切换">
+  <button type="button" id="tabAnimals" class="vt active">动物图鉴</button>
+  <button type="button" id="tabMounts" class="vt">底座总览</button>
+</nav>
+
+<!-- ===== 动物视图 ===== -->
+<section class="toolbar view-animals" aria-label="筛选与搜索">
+  <div class="toolbar-inner">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16.5 16.5 L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input type="search" id="q" placeholder="搜索动物名称或代码，如 蓝羊 / blue_sheep" autocomplete="off">
+    </div>
+    <div class="filters">
+      <label>类别
+        <select id="fFamily"><option value="">全部</option></select>
+      </label>
+      <label>地图
+        <select id="fMap"><option value="">全部</option></select>
+      </label>
+      <label>稀有度
+        <select id="fRarity">
+          <option value="">全部稀有以上</option>
+          <option value="rare">仅含稀有</option>
+          <option value="veryrare">仅含极稀有</option>
+          <option value="go">仅含传奇（GO）</option>
+        </select>
+      </label>
+      <label>排序
+        <select id="fSort">
+          <option value="family">类别 · 名称</option>
+          <option value="name">名称</option>
+          <option value="rareCount">稀有毛色数</option>
+        </select>
+      </label>
+      <button type="button" id="btnReset" class="btn-reset">重置</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 联动统计带 ===== -->
+<section class="summary-strip view-animals" id="summaryStrip" aria-live="polite"></section>
+
+<!-- ===== 主体 ===== -->
+<main class="layout view-animals">
+  <aside class="side">
+    <section class="panel" id="familyPanel" aria-label="类别概览">
+      <h2 class="panel-title">类别概览</h2>
+      <div class="bars" id="familyBars"></div>
+    </section>
+    <section class="panel" id="mapPanel" aria-label="地图分布">
+      <h2 class="panel-title">地图分布</h2>
+      <div class="bars" id="mapBars"></div>
+    </section>
+    <section class="panel" id="mountPanel" aria-label="底座速查">
+      <h2 class="panel-title">Matt 底座速查</h2>
+      <div id="mountList"></div>
+    </section>
+  </aside>
+
+  <section class="list-panel" aria-label="动物列表">
+    <div class="list-head">
+      <h2 class="panel-title">动物 <span class="count" id="listCount"></span></h2>
+      <p class="list-hint">点击行展开毛色 / 地图 / 底座详情</p>
+    </div>
+    <div class="animal-list" id="animalList"></div>
+    <div class="empty" id="emptyState" hidden>
+      <p>没有符合条件的物种。</p>
+      <p>试试放宽类别、地图或稀有度筛选。</p>
+    </div>
+  </section>
+</main>
+
+<!-- ===== 底座视图 ===== -->
+<section class="mount-catalog view-mounts" id="mountCatalog" hidden>
+  <div class="mc-head">
+    <h2 class="panel-title">Matt 底座总览</h2>
+    <input type="search" id="mcQ" placeholder="搜索底座名，如 Duck Out" autocomplete="off">
+    <span class="count" id="mcCount"></span>
+  </div>
+  <p class="mc-hint">按底座聚合，展示每个多功能底座支持的动物；点击动物标签可跳转到动物图鉴并定位该物种。</p>
+  <div class="mc-grid" id="mcGrid"></div>
+</section>
+
+<!-- ===== 数据源 ===== -->
+<footer class="foot">
+  <div class="foot-inner">
+    <p>数据源：gameslikefinder《Rare Fur Types List》（2026-06-24，20 张地图）· thewildregister.com / TacMaps（骆马）· Matt 底座蓝图来自 thehuntercotw.wordpress.com（2025-07-06）。</p>
+    <p>蓝羊、孟加拉虎稀有度已按实机变体数组（2026-10-24 游戏运行中读取）修正，与第三方文章有出入处以实机为准。页面为本地静态文件，直接双击 index.html 打开。</p>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
