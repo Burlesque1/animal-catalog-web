@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://burlesque1.github.io/animal-catalog-web/sitemap.xml
