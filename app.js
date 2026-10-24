@@ -63,7 +63,7 @@
     mcCountTpl: { en: "mounts ·", zh: "个底座 ·" },
     mcCountSp: { en: "species", zh: "种支持" },
     footSrc: { en: "Sources: gameslikefinder Rare Fur Types List (2026-06-24, 20 reserves) · thewildregister.com / TacMaps (vicuña) · Matt mount blueprints from thehuntercotw.wordpress.com (2025-07-06).", zh: "数据源：gameslikefinder《Rare Fur Types List》（2026-06-24，20 张地图）· thewildregister.com / TacMaps（骆马）· Matt 底座蓝图来自 thehuntercotw.wordpress.com（2025-07-06）。" },
-    footNote: { en: "Blue sheep & Bengal tiger rarities corrected against live in-game variant data (read 2026-10-24); live data wins over third-party articles. Static local page — open index.html directly.", zh: "蓝羊、孟加拉虎稀有度已按实机变体数组（2026-10-24 游戏运行中读取）修正，与第三方文章有出入处以实机为准。页面为本地静态文件，直接双击 index.html 打开。" }
+    footNote: { en: "Blue sheep & Bengal tiger rarities corrected against live in-game variant data (read 2026-10-24); live data wins over third-party articles. Available online via GitHub Pages; the local copy can also be opened through index.html with its accompanying files.", zh: "蓝羊、孟加拉虎稀有度已按实机变体数组（2026-10-24 游戏运行中读取）修正，与第三方文章有出入处以实机为准。已通过 GitHub Pages 在线发布；本地副本保留配套文件后，也可双击 index.html 打开。" }
   };
 
   var EN_FAMILY = {
