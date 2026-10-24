@@ -56,13 +56,16 @@ body {
 }
 .hero-bg {
   position: absolute; inset: 0;
-  background: url("assets/hero-logo.jpg") center 30% / cover no-repeat;
-  filter: saturate(0.85) contrast(1.05);
+  background:
+    radial-gradient(1100px 460px at 18% -12%, rgba(141,196,122,0.30), transparent 62%),
+    radial-gradient(880px 400px at 86% 18%, rgba(224,169,88,0.20), transparent 56%),
+    radial-gradient(700px 340px at 55% 95%, rgba(78,155,134,0.16), transparent 60%),
+    linear-gradient(180deg, #152219 0%, #1c2c21 46%, #0e150d 100%);
 }
 .hero-bg::after {
   content: "";
   position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(20,29,24,0.55) 0%, rgba(20,29,24,0.72) 62%, var(--ink) 100%);
+  background: linear-gradient(180deg, rgba(20,29,24,0.30) 0%, rgba(20,29,24,0.45) 62%, var(--ink) 100%);
 }
 .hero-inner {
   position: relative;
