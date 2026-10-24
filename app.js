@@ -10,6 +10,13 @@
   function classOf(a){return infoOf(a).animalClass;}
   function classText(a){return classOf(a)==null?T("classUnknown"):(LANG==="en"?"Class "+classOf(a):classOf(a)+" 级");}
 
+  // GO 视角备注双语: 已知结构化短语译双语; 未知原文保留不丢信息
+  function viewsLabel(v){
+    if(!v) return "";
+    if(v.indexOf("侧面视角")>=0) return LANG==="en" ? "Left/Right side views; pattern not yet confirmed" : "左/右侧面视图；花纹差异尚未确认";
+    return v;
+  }
+
   /* ---- 双语字典 ---- */
   var I18N = {
     heroTitle: { en: "Rare Fur & Mount Catalog", zh: "全物种稀有毛色图鉴" },
@@ -17,6 +24,7 @@
     lgRare: { en: "Rare fur (0.1%–1%)", zh: "稀有毛色（0.1%–1%）" },
     lgVeryrare: { en: "Very rare fur (<0.1%)", zh: "极稀有毛色（<0.1%）" },
     lgGo: { en: "Has Great One fur", zh: "有 Great One 传奇毛色" },
+    lgGoShort: { en: "GO", zh: "传奇" },
     tabAnimals: { en: "Species", zh: "动物图鉴" },
     tabMounts: { en: "Mounts", zh: "底座总览" },
     lblFamily: { en: "Animal type", zh: "动物类别" },
@@ -27,7 +35,8 @@
     optAll: { en: "All", zh: "全部" },
     optRare: { en: "Rare only", zh: "仅含稀有" },
     optVeryrare: { en: "Very rare only", zh: "仅含极稀有" },
-    optGo: { en: "Great One only", zh: "仅含传奇（GO）" },
+    optGo: { en: "GO-supported (incl. community)", zh: "有证据支持 GO（含社区）" },
+    optGoOfficial: { en: "Official-source GO", zh: "官方来源确认 GO" },
     optSortFamily: { en: "Type · Name", zh: "类别 · 名称" },
     optSortName: { en: "Name", zh: "名称" },
     optSortCount: { en: "Rare count", zh: "稀有毛色数" },
@@ -61,6 +70,7 @@
     mNoMountMore: { en: "Plus", zh: "另有" },
     mNoMountNo: { en: "species without mounts:", zh: "种暂无底座：" },
     dRareFurs: { en: "Rare+ Furs", zh: "稀有以上毛色" },
+    dGoFurs: { en: "Great One Furs", zh: "传奇(GO)毛色" },
     dReserves: { en: "Reserves", zh: "出现地图" },
     dMounts: { en: "Matt Mount Blueprints", zh: "Matt 底座蓝图" },
     noMountDetail: { en: "No official multi-mount for this species (as of Patch 9.2)", zh: "官方暂无该物种多功能底座（截至 Patch 9.2）" },
@@ -83,11 +93,11 @@
 
   var EN_MAP = {
     "莱顿湖": "Layton Lake", "银岭峰": "Silver Ridge Peaks", "赫希费尔登": "Hirschfelden",
-    "梅德韦泰加": "Medved-Taiga", "武洪加草原": "Vurhonga Savanna", "费尔南多公园": "Parque Fernando",
-    "育空河谷": "Yukon Valley", "四峰猎场": "Cuatro Colinas", "密西西比": "Mississippi",
-    "新英格兰山脉": "New England Mountains", "阿罗约牧场": "Rancho del Arroyo", "阿瓦罗阿": "Te Awaroa",
-    "雷冯图利海岸": "Revontuli Coast", "翡翠海岸": "Emerald Coast", "孙达尔帕坦": "Sundarpatan",
-    "盐泽公园": "Salzwiesen Park", "阿斯基脊": "Ashkirk", "托尔南西恩": "Torr nan Sithean",
+    "梅德韦泰嘉": "Medved-Taiga", "乌尔霍加热带稀树草原": "Vurhonga Savanna", "费南多自然公园": "Parque Fernando",
+    "育空河谷": "Yukon Valley", "夸特罗·科利纳斯野生动物保护区": "Cuatro Colinas", "密西西比阿克里斯保护区": "Mississippi Acres Preserve",
+    "新英格兰山脉": "New England Mountains", "阿罗约牧场": "Rancho del Arroyo", "蒂阿拉罗瓦国家公园": "Te Awaroa National Park",
+    "雷文图里海岸": "Revontuli Coast", "翡翠海岸": "Emerald Coast", "桑达帕坦": "Sundarpatan",
+    "萨尔茨维森公园": "Salzwiesen Park", "阿尔伯塔狩猎保护区": "Askiy Ridge", "托尔南西恩": "Torr nan Sithean",
     "因蒂苏尤": "Intisuyu"
   };
   var EN_MAP_SUFFIX = { "因蒂苏尤": " (Peru)", "托尔南西恩": " (Scotland)" };
@@ -163,7 +173,7 @@
     "european_badger": "European Badger"
   };
 
-  var EN_GRADE = { "稀有": "Rare", "极稀有": "Very Rare" };
+  var EN_GRADE = { "稀有": "Rare", "极稀有": "Very Rare", "传奇": "Great One" };
 
   function T(k) {
     var e = I18N[k];
@@ -227,7 +237,8 @@
 
   function mapsOf(a) { return a.maps; }
 
-  function allFamilies() { return GROUP_ORDER; }
+  // Hide catalog-wide empty categories; other filters do not make categories disappear.
+  function allFamilies() { return GROUP_ORDER.filter(function (k) { return data.some(function (a) { return groupOf(a) === k; }); }); }
   function allMaps() { return unique(data.reduce(function (acc, a) { return acc.concat(mapsOf(a)); }, [])).sort(); }
 
   /* 每动物预建搜索文本：中/英文名、代码、类别、地图 + 地图俗称 */
@@ -242,6 +253,10 @@
     a.rare.forEach(function (r) {
       parts.push(r[0]);
       if (EN_FUR[r[0]]) parts.push(EN_FUR[r[0]]);
+    });
+    (a.go || []).forEach(function (g) {
+      parts.push(g.en);
+      if (g.z) parts.push(g.z);
     });
     hayCache[a.code] = { l: LANG, s: parts.join(" ").toLowerCase() };
     return hayCache[a.code].s;
@@ -265,7 +280,10 @@
     el.fMap.value = state.map;
   }
 
-  function hasGO(a) { return /传奇毛色/.test(a.note || ""); }
+  function hasGO(a) { return (a.go && a.go.length > 0) || /传奇毛色/.test(a.note || ""); }
+  // 官方来源确认 GO（存在级官方证据；社区/存疑/待核不计入）
+  var OFFICIAL_GO = { black_bear:1, jaguar:1, moose:1, mule_deer:1, roe_deer:1, tahr:1, whitetail_deer:1, wild_boar:1 };
+  function hasOfficialGO(a){ return !!OFFICIAL_GO[a.code]; }
 
   function matches(a) {
     if (state.family && groupOf(a) !== state.family) return false;
@@ -274,6 +292,7 @@
     if (state.rarity === "rare" && !a.rare.some(function (r) { return r[1] === "稀有"; })) return false;
     if (state.rarity === "veryrare" && !a.rare.some(function (r) { return r[1] === "极稀有"; })) return false;
     if (state.rarity === "go" && !hasGO(a)) return false;
+    if (state.rarity === "go_official" && !hasOfficialGO(a)) return false;
     if (state.q && searchHay(a).indexOf(state.q.toLowerCase()) < 0) return false;
     return true;
   }
@@ -305,7 +324,7 @@
     });
     var items = [
       [data.length, T("stSpecies")],
-      [GROUP_ORDER.length, T("stFamilies")],
+      [allFamilies().length, T("stFamilies")],
       [allMaps().length, T("stMaps")],
       [rareCount, T("stRareEntries")],
       [goCount, T("stGOSpecies")]
@@ -353,7 +372,7 @@
   function familyCounts() {
     var map = {};
     data.forEach(function (a) { var k=groupOf(a);map[k] = (map[k] || 0) + 1; });
-    return GROUP_ORDER.map(function (k) { return [k, map[k] || 0]; });
+    return allFamilies().map(function (k) { return [k, map[k] || 0]; });
   }
   function mapCounts() {
     var map = {};
@@ -485,7 +504,25 @@
       var classEvidence=infoOf(a).sources.map(function(url){return '<a href="'+escAttr(url)+'" target="_blank" rel="noopener noreferrer">'+esc(new URL(url).hostname)+'</a>';}).join(" / ");
       var detailMount = mountChips || '<span style="color:rgba(30,43,36,0.45);font-size:12px">' + esc(T("noMountDetail")) + '</span>';
       var rareLis = a.rare.map(function (r) {
-        return '<li>' + '<span class="grade grade-' + (r[1] === "极稀有" ? "vr" : "r") + '">' + esc(gradeName(r[1])) + "</span>" + esc(furName(r[0])) + "</li>";
+        var sx = (a.sex && a.sex[r[0]]) || "";
+        var sxTag = sx === "f" ? '<span class="sex-tag">♀</span>'
+          : sx === "m" ? '<span class="sex-tag">♂</span>'
+          : sx === "b" ? '<span class="sex-tag">♂♀</span>'
+          : sx === "fu" ? '<span class="sex-tag" title="' + escAttr(LANG === "en" ? "Single source; unverified" : "单源,待互证") + '">♀?</span>'
+          : sx === "mu" ? '<span class="sex-tag" title="' + escAttr(LANG === "en" ? "Single source; unverified" : "单源,待互证") + '">♂?</span>'
+          : "";
+        return '<li>' + '<span class="grade grade-' + (r[1] === "极稀有" ? "vr" : "r") + '">' + esc(gradeName(r[1])) + "</span>" + esc(furName(r[0])) + sxTag + "</li>";
+      }).join("");
+      var goLis = (a.go || []).map(function (g) {
+        var name = LANG === "en" ? g.en : (g.z || g.en);
+        var untr = (LANG === "zh" && !g.z) ? '<span class="unverified">†</span>' : "";
+        var sxTag = g.sx === "m" ? '<span class="sex-tag">♂</span>'
+          : g.sx === "f" ? '<span class="sex-tag">♀</span>'
+          : g.sx === "mi" ? '<span class="sex-tag" title="' + escAttr(LANG === "en" ? "Inferred from antlers/tusks — not officially stated" : "由角/牙推断雄性,非官方性别陈述") + '">♂*</span>'
+          : '<span class="sex-tag sex-unknown">' + (LANG === "en" ? "sex TBD" : "性别待核") + '</span>';
+        var viewsTxt = viewsLabel(g.views);
+        var views = viewsTxt ? ' <span class="views-note">(' + esc(viewsTxt) + ")</span>" : "";
+        return '<li><span class="grade grade-go">' + esc(T("lgGoShort")) + '</span>' + esc(name) + untr + sxTag + views + "</li>";
       }).join("");
       var mapLis = a.maps.map(function (m) {
         return '<li>' + ICONS.pin + esc(mapDisplay(m)) + "</li>";
@@ -512,7 +549,7 @@
         "</div>" +
         '<div class="detail">' +
           '<div class="detail-grid">' +
-            "<div><h3>" + esc(T("dRareFurs")) + " · " + a.rare.length + "</h3><ul>" + rareLis + "</ul></div>" +
+            "<div><h3>" + esc(T("dRareFurs")) + " · " + a.rare.length + "</h3><ul>" + rareLis + "</ul>" + (goLis ? "<h3>" + esc(T("dGoFurs")) + " · " + (a.go||[]).length + "</h3><ul>" + goLis + "</ul><p class='views-note'>" + esc(LANG==="en" ? "† = Chinese display name not officially verified. Himalayan Tahr's seven Great One furs now carry game-localized Chinese names (verified against the game's internal SortedPairs string table, 2025-10-25); other species' GO names remain community/shorthand names pending verification. Side notes are render views, not separate furs." : "† = 中文显示名未经官方核实。喜马拉雅塔尔羊七种传奇毛色已采用游戏本地化中文名（2025-10-25 对照游戏内部 SortedPairs 字符串表核实）；其余物种 GO 名为社区/简称，待核。括号视图为渲染侧面，非独立毛色。") + "</p>" : "") + "</div>" +
             "<div><h3>" + esc(T("dReserves")) + "</h3><ul>" + mapLis + "</ul></div>" +
             "<div><h3>" + esc(T("dMounts")) + "</h3>" + detailMount + "</div>" +
           "</div>" +

@@ -349,6 +349,11 @@ body {
 }
 .grade-r { background: var(--gold); }
 .grade-vr { background: var(--violet); }
+.grade-go { background: #7a4bb3; }
+.sex-tag { font-size: 11px; font-weight: 700; color: #7a4bb3; }
+.sex-unknown { font-size: 10px; color: rgba(30,43,36,0.55); font-weight: 600; }
+.unverified { font-size: 10px; color: rgba(30,43,36,0.45); cursor: help; }
+.views-note { font-size: 11px; color: rgba(30,43,36,0.5); }
 .mount-chip {
   display: inline-block; font-size: 12px;
   background: rgba(124,139,111,0.18);
