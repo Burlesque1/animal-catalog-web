@@ -12,23 +12,24 @@
 <!-- ===== Hero ===== -->
 <header class="hero">
   <div class="hero-bg" role="img" aria-label="秋日森林中的小鹿，游戏宣传画面"></div>
+  <div class="hero-lang"><button type="button" id="btnLang" class="lang-btn">中文</button></div>
   <div class="hero-inner">
     <img class="hero-logo" src="assets/official-logo.png" alt="theHunter: Call of the Wild">
-    <h1 class="hero-title">全物种稀有毛色图鉴</h1>
-    <p class="hero-sub">127 种动物 · 稀有毛色 · 地图分布 · Matt 底座蓝图 —— 一站查清值得打的每一只</p>
+    <h1 class="hero-title" data-i18n="heroTitle">全物种稀有毛色图鉴</h1>
+    <p class="hero-sub" data-i18n="heroSub">127 种动物 · 稀有毛色 · 地图分布 · Matt 底座蓝图 —— 一站查清值得打的每一只</p>
     <div class="hero-stats" id="heroStats"></div>
     <div class="hero-legend" aria-label="毛色图例">
-      <span class="hlg"><i class="dot dot-rare"></i>稀有毛色（0.1%–1%）</span>
-      <span class="hlg"><i class="dot dot-veryrare"></i>极稀有毛色（&lt;0.1%）</span>
-      <span class="hlg"><i class="dot dot-go"></i>有 Great One 传奇毛色</span>
+      <span class="hlg"><i class="dot dot-rare"></i><span data-i18n="lgRare">稀有毛色（0.1%–1%）</span></span>
+      <span class="hlg"><i class="dot dot-veryrare"></i><span data-i18n="lgVeryrare">极稀有毛色（&lt;0.1%）</span></span>
+      <span class="hlg"><i class="dot dot-go"></i><span data-i18n="lgGo">有 Great One 传奇毛色</span></span>
     </div>
   </div>
 </header>
 
 <!-- ===== 视图页签 ===== -->
 <nav class="view-tabs" aria-label="视图切换">
-  <button type="button" id="tabAnimals" class="vt active">动物图鉴</button>
-  <button type="button" id="tabMounts" class="vt">底座总览</button>
+  <button type="button" id="tabAnimals" class="vt active" data-i18n="tabAnimals">动物图鉴</button>
+  <button type="button" id="tabMounts" class="vt" data-i18n="tabMounts">底座总览</button>
 </nav>
 
 <!-- ===== 动物视图 ===== -->
@@ -36,31 +37,31 @@
   <div class="toolbar-inner">
     <div class="search-box">
       <svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16.5 16.5 L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      <input type="search" id="q" placeholder="搜索动物名称或代码，如 蓝羊 / blue_sheep" autocomplete="off">
+      <input type="search" id="q" placeholder="搜索动物名称或代码，如 蓝羊 / blue_sheep" autocomplete="off" data-i18n-ph="phSearch">
     </div>
     <div class="filters">
-      <label>类别
+      <label data-i18n="lblFamily">类别
         <select id="fFamily"><option value="">全部</option></select>
       </label>
-      <label>地图
+      <label data-i18n="lblMap">地图
         <select id="fMap"><option value="">全部</option></select>
       </label>
-      <label>稀有度
+      <label data-i18n="lblRarity">稀有度
         <select id="fRarity">
-          <option value="">全部稀有以上</option>
-          <option value="rare">仅含稀有</option>
-          <option value="veryrare">仅含极稀有</option>
-          <option value="go">仅含传奇（GO）</option>
+          <option value="" data-i18n="optRareAll">全部稀有以上</option>
+          <option value="rare" data-i18n="optRare">仅含稀有</option>
+          <option value="veryrare" data-i18n="optVeryrare">仅含极稀有</option>
+          <option value="go" data-i18n="optGo">仅含传奇（GO）</option>
         </select>
       </label>
-      <label>排序
+      <label data-i18n="lblSort">排序
         <select id="fSort">
-          <option value="family">类别 · 名称</option>
-          <option value="name">名称</option>
-          <option value="rareCount">稀有毛色数</option>
+          <option value="family" data-i18n="optSortFamily">类别 · 名称</option>
+          <option value="name" data-i18n="optSortName">名称</option>
+          <option value="rareCount" data-i18n="optSortCount">稀有毛色数</option>
         </select>
       </label>
-      <button type="button" id="btnReset" class="btn-reset">重置</button>
+      <button type="button" id="btnReset" class="btn-reset" data-i18n="btnReset">重置</button>
     </div>
   </div>
 </section>
@@ -72,28 +73,28 @@
 <main class="layout view-animals">
   <aside class="side">
     <section class="panel" id="familyPanel" aria-label="类别概览">
-      <h2 class="panel-title">类别概览</h2>
+      <h2 class="panel-title" data-i18n="ptFamilies">类别概览</h2>
       <div class="bars" id="familyBars"></div>
     </section>
     <section class="panel" id="mapPanel" aria-label="地图分布">
-      <h2 class="panel-title">地图分布</h2>
+      <h2 class="panel-title" data-i18n="ptMaps">地图分布</h2>
       <div class="bars" id="mapBars"></div>
     </section>
     <section class="panel" id="mountPanel" aria-label="底座速查">
-      <h2 class="panel-title">Matt 底座速查</h2>
+      <h2 class="panel-title" data-i18n="ptMounts">Matt 底座速查</h2>
       <div id="mountList"></div>
     </section>
   </aside>
 
   <section class="list-panel" aria-label="动物列表">
     <div class="list-head">
-      <h2 class="panel-title">动物 <span class="count" id="listCount"></span></h2>
-      <p class="list-hint">点击行展开毛色 / 地图 / 底座详情</p>
+      <h2 class="panel-title"><span data-i18n="lblAnimals">动物</span> <span class="count" id="listCount"></span></h2>
+      <p class="list-hint" data-i18n="listHint">点击行展开毛色 / 地图 / 底座详情</p>
     </div>
     <div class="animal-list" id="animalList"></div>
     <div class="empty" id="emptyState" hidden>
-      <p>没有符合条件的物种。</p>
-      <p>试试放宽类别、地图或稀有度筛选。</p>
+      <p data-i18n="empty1">没有符合条件的物种。</p>
+      <p data-i18n="empty2">试试放宽类别、地图或稀有度筛选。</p>
     </div>
   </section>
 </main>
@@ -101,19 +102,19 @@
 <!-- ===== 底座视图 ===== -->
 <section class="mount-catalog view-mounts" id="mountCatalog" hidden>
   <div class="mc-head">
-    <h2 class="panel-title">Matt 底座总览</h2>
-    <input type="search" id="mcQ" placeholder="搜索底座名，如 Duck Out" autocomplete="off">
+    <h2 class="panel-title" data-i18n="ptMountCatalog">Matt 底座总览</h2>
+    <input type="search" id="mcQ" placeholder="搜索底座名，如 Duck Out" autocomplete="off" data-i18n-ph="phMounts">
     <span class="count" id="mcCount"></span>
   </div>
-  <p class="mc-hint">按底座聚合，展示每个多功能底座支持的动物；点击动物标签可跳转到动物图鉴并定位该物种。</p>
+  <p class="mc-hint" data-i18n="mcHint">按底座聚合，展示每个多功能底座支持的动物；点击动物标签可跳转到动物图鉴并定位该物种。</p>
   <div class="mc-grid" id="mcGrid"></div>
 </section>
 
 <!-- ===== 数据源 ===== -->
 <footer class="foot">
   <div class="foot-inner">
-    <p>数据源：gameslikefinder《Rare Fur Types List》（2026-06-24，20 张地图）· thewildregister.com / TacMaps（骆马）· Matt 底座蓝图来自 thehuntercotw.wordpress.com（2025-07-06）。</p>
-    <p>蓝羊、孟加拉虎稀有度已按实机变体数组（2026-10-24 游戏运行中读取）修正，与第三方文章有出入处以实机为准。页面为本地静态文件，直接双击 index.html 打开。</p>
+    <p data-i18n="footSrc">数据源：gameslikefinder《Rare Fur Types List》（2026-06-24，20 张地图）· thewildregister.com / TacMaps（骆马）· Matt 底座蓝图来自 thehuntercotw.wordpress.com（2025-07-06）。</p>
+    <p data-i18n="footNote">蓝羊、孟加拉虎稀有度已按实机变体数组（2026-10-24 游戏运行中读取）修正，与第三方文章有出入处以实机为准。页面为本地静态文件，直接双击 index.html 打开。</p>
   </div>
 </footer>
 
