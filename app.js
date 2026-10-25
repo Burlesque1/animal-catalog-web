@@ -121,6 +121,17 @@
     "白杂交": "White Hybrid", "红棕": "Reddish Brown", "稀银": "Diluted Silver"
   };
 
+  // 物种级毛色英文覆盖：同一中文毛色名在不同物种英文不同，优先于全局 EN_FUR。
+  // 依据：thewildregister / cotwhub 物种页、nexusmods 物种毛色表、官方 Patch 8.4/9.0。
+  var SPECIES_FUR_EN = {
+    "south_american_tapir": { "红变": "Erythristic" },
+    "spectacled_bear": { "红变": "Erythristic Red" },
+    "gemsbok": { "米黄": "Beige", "金": "Gold" },
+    "wild_yak": { "金": "Gold" },
+    "bengal_tiger": { "金": "Gold" },
+    "willow_ptarmigan": { "红": "Erythristic" }
+  };
+
   var EN_SPECIES = {
     "eastern_cottontail_rabbit": "Eastern Cottontail Rabbit", "mountain_hare": "Mountain Hare",
     "european_hare": "European Hare", "european_rabbit": "European Rabbit", "scrub_hare": "Scrub Hare",
@@ -187,7 +198,12 @@
     if (LANG === "en") return mapBase(m) + (EN_MAP_SUFFIX[m] || "");
     return MAP_DISPLAY[m] || m;
   }
-  function furName(f) { return LANG === "en" ? (EN_FUR[f] || f) : f; }
+  function furName(a, f) {
+    if (LANG !== "en") return f;
+    var sp = SPECIES_FUR_EN[a.code];
+    if (sp && sp[f]) return sp[f];
+    return EN_FUR[f] || f;
+  }
   function gradeName(g) { return LANG === "en" ? (EN_GRADE[g] || g) : g; }
 
   var MAP_WORDS = {
@@ -252,12 +268,21 @@
     });
     a.rare.forEach(function (r) {
       parts.push(r[0]);
-      if (EN_FUR[r[0]]) parts.push(EN_FUR[r[0]]);
+      var spFur = SPECIES_FUR_EN[a.code];
+      if (spFur && spFur[r[0]]) parts.push(spFur[r[0]]);
+      else if (EN_FUR[r[0]]) parts.push(EN_FUR[r[0]]);
     });
     (a.go || []).forEach(function (g) {
       parts.push(g.en);
       if (g.z) parts.push(g.z);
     });
+    var HISTORY_ALIAS = {
+      wild_boar: ["Fabled Stripple"],
+      gray_wolf: ["Fabled Battlethorne"],
+      moose: ["Fabled Two Tones"],
+      red_fox: ["Fabled Candycane"]
+    };
+    if (HISTORY_ALIAS[a.code]) parts = parts.concat(HISTORY_ALIAS[a.code]);
     hayCache[a.code] = { l: LANG, s: parts.join(" ").toLowerCase() };
     return hayCache[a.code].s;
   }
@@ -495,7 +520,7 @@
     var html = list.map(function (a) {
       var open = state.open[a.code] ? " open" : "";
       var dots = a.rare.map(function (r) {
-        return '<i class="dot ' + (r[1] === "极稀有" ? "dot-veryrare" : "dot-rare") + '" title="' + esc(furName(r[0])) + " · " + esc(gradeName(r[1])) + '"></i>';
+        return '<i class="dot ' + (r[1] === "极稀有" ? "dot-veryrare" : "dot-rare") + '" title="' + esc(furName(a, r[0])) + " · " + esc(gradeName(r[1])) + '"></i>';
       }).join("");
       if (hasGO(a)) dots += '<i class="dot dot-go" title="' + esc(LANG === "en" ? "Has Great One fur" : "有传奇毛色") + '"></i>';
       var mountChips = a.mounts.map(function (m) {
@@ -511,7 +536,7 @@
           : sx === "fu" ? '<span class="sex-tag" title="' + escAttr(LANG === "en" ? "Single source; unverified" : "单源,待互证") + '">♀?</span>'
           : sx === "mu" ? '<span class="sex-tag" title="' + escAttr(LANG === "en" ? "Single source; unverified" : "单源,待互证") + '">♂?</span>'
           : "";
-        return '<li>' + '<span class="grade grade-' + (r[1] === "极稀有" ? "vr" : "r") + '">' + esc(gradeName(r[1])) + "</span>" + esc(furName(r[0])) + sxTag + "</li>";
+        return '<li>' + '<span class="grade grade-' + (r[1] === "极稀有" ? "vr" : "r") + '">' + esc(gradeName(r[1])) + "</span>" + esc(furName(a, r[0])) + sxTag + "</li>";
       }).join("");
       var goLis = (a.go || []).map(function (g) {
         var name = LANG === "en" ? g.en : (g.z || g.en);
