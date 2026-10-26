@@ -9,7 +9,7 @@
 <meta name="description" content="theHunter: Call of the Wild — complete catalog of all species, rare & very rare fur types, reserve maps, and Matt mount blueprints. 全物种稀有毛色图鉴：稀有毛色、地图分布、Matt 底座蓝图。">
 <title>theHunter: Call of the Wild — Rare Fur &amp; Mount Catalog</title>
 <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=8ecf02379f8a">
 </head>
 <body>
 
@@ -47,18 +47,34 @@
       <label><span data-i18n="lblFamily">动物类别</span>
         <select id="fFamily"><option value="">全部</option></select>
       </label>
+      <div class="species-field">
+        <span class="filter-label" id="speciesLabel" data-i18n="lblSpecies">物种</span>
+        <details id="fSpecies" class="species-dropdown">
+          <summary aria-labelledby="speciesLabel speciesSummary" aria-controls="speciesMenu"><span id="speciesSummary">全部物种</span><span class="rarity-chevron" aria-hidden="true"></span></summary>
+          <div id="speciesMenu" class="species-menu" role="group" aria-labelledby="speciesLabel">
+            <input type="search" id="speciesSearch" autocomplete="off" data-i18n-ph="phSpecies" placeholder="搜索物种名称或代码">
+            <div class="species-actions"><button type="button" id="speciesAll" data-i18n="allSpecies">全部物种</button><button type="button" id="speciesClear" data-i18n="rarityClear">清空</button></div>
+            <div id="speciesOptions" class="species-options"></div>
+            <p id="speciesStatus" class="species-status" aria-live="polite"></p>
+          </div>
+        </details>
+      </div>
       <label><span data-i18n="lblMap">地图</span>
         <select id="fMap"><option value="">全部</option></select>
       </label>
-      <label><span data-i18n="lblRarity">稀有度</span>
-        <select id="fRarity">
-          <option value="" data-i18n="optRareAll">全部稀有以上</option>
-          <option value="rare" data-i18n="optRare">仅含稀有</option>
-          <option value="veryrare" data-i18n="optVeryrare">仅含极稀有</option>
-          <option value="go" data-i18n="optGo">有证据支持 GO（含社区）</option>
-          <option value="go_official" data-i18n="optGoOfficial">官方来源确认 GO</option>
-        </select>
-      </label>
+      <div class="rarity-field">
+        <span class="filter-label" id="rarityLabel" data-i18n="lblRarity">稀有度</span>
+        <details id="fRarity" class="rarity-dropdown">
+          <summary aria-labelledby="rarityLabel raritySummary" aria-controls="rarityMenu"><span id="raritySummary">全部稀有以上</span><span class="rarity-chevron" aria-hidden="true"></span></summary>
+          <div id="rarityMenu" class="rarity-menu" role="group" aria-labelledby="rarityLabel">
+            <label class="rarity-option"><input type="checkbox" value="rare" checked><i class="dot dot-rare" aria-hidden="true"></i><span data-i18n="rarityRare">稀有</span></label>
+            <label class="rarity-option"><input type="checkbox" value="veryrare" checked><i class="dot dot-veryrare" aria-hidden="true"></i><span data-i18n="rarityVeryrare">极稀有</span></label>
+            <label class="rarity-option"><input type="checkbox" value="go" checked><i class="dot dot-go" aria-hidden="true"></i><span data-i18n="rarityGO">传奇</span></label>
+            <div class="rarity-actions"><button type="button" id="rarityAll" data-i18n="raritySelectAll">全选</button><button type="button" id="rarityClear" data-i18n="rarityClear">清空</button></div>
+            <p class="rarity-help" data-i18n="rarityOr">可多选，所选等级取“或”。</p>
+          </div>
+        </details>
+      </div>
       <label><span data-i18n="lblClass">动物等级</span>
         <select id="fClass"><option value="">全部</option></select>
       </label>
@@ -124,12 +140,12 @@
   <div class="foot-inner">
     <p data-i18n="footSrc">数据源：gameslikefinder《Rare Fur Types List》（2026-06-24，20 张地图）· thewildregister.com / TacMaps（骆马）· Matt 底座蓝图来自 thehuntercotw.wordpress.com（2025-07-06）。</p>
     <p data-i18n="footClasses">Animal types follow the four Trophy Manager groups. Animal Class uses public reference data, not trophy difficulty or medals; unresolved records remain unverified.</p>
-    <p data-i18n="footNote">Blue sheep &amp; Bengal tiger rarities corrected against live in-game variant data (read 2026-10-24); live data wins over third-party articles. Available online via GitHub Pages; the local copy can also be opened through index.html with its accompanying files.</p>
+    <p data-i18n="footNote">更新于2026-10-26。游戏二级分类筛选尚未提供；性别标签沿用现有参考资料。</p>
   </div>
 </footer>
 
-<script src="data.js"></script>
-<script src="game-filters.js"></script>
-<script src="app.js"></script>
+<script src="data.js?v=878ef57801be"></script>
+<script src="game-filters.js?v=cbb3968699f3"></script>
+<script src="app.js?v=0c92a9c625a3"></script>
 </body>
 </html>

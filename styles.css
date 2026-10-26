@@ -367,6 +367,37 @@ body {
 }
 .note { font-size: 12.5px; color: rgba(30,43,36,0.72); margin-top: 4px; }
 
+/* ===== Verified Bengal Tiger variants: bounded rows, not merged by Chinese name ===== */
+.animal-card[data-code="bengal_tiger"] .detail-grid { grid-template-columns:1fr; }
+.tiger-furs h3 { font-size:14px; letter-spacing:0; text-transform:none; opacity:1; }
+.tiger-count { font-size:14px; margin:0 0 10px; color:var(--ink-2); }
+.detail .tiger-fur-list { gap:0; }
+.detail .tiger-fur-row { display:grid; grid-template-columns:76px minmax(0,1fr) auto; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--paper-line); font-size:14px; }
+.tiger-fur-row .grade { font-size:12px; text-align:center; }
+.tiger-fur-name { min-width:0; overflow-wrap:anywhere; }
+.tiger-fur-name strong { font-weight:600; }
+.tiger-en { display:block; font-size:14px; color:rgba(30,43,36,.72); }
+.tiger-variant { white-space:nowrap; font-size:13px; font-variant-numeric:tabular-nums; }
+.tiger-config { margin-top:16px; font-size:14px; }
+.tiger-config summary { min-height:44px; padding:8px 0; cursor:pointer; }
+.tiger-config > summary { font-weight:700; border-top:1px solid var(--paper-line); }
+.tiger-config summary:focus-visible { outline:2px solid var(--safety); outline-offset:2px; }
+.tiger-config table { width:100%; table-layout:fixed; border-collapse:collapse; }
+.tiger-config th,.tiger-config td { padding:8px 4px; text-align:left; vertical-align:top; border-bottom:1px solid var(--paper-line); overflow-wrap:anywhere; }
+.tiger-config p { margin:8px 0; overflow-wrap:anywhere; }
+@media(max-width:600px){
+  .tiger-config table,.tiger-config tbody { display:block; }
+  .tiger-config thead,.tiger-config colgroup { display:none; }
+  .tiger-config tr { display:grid; grid-template-columns:28px minmax(0,1fr); padding:10px 0; border-bottom:1px solid var(--paper-line); }
+  .tiger-config td { border:0; min-width:0; }
+  .tiger-config td:last-child { grid-column:2; padding-top:0; }
+  .tiger-config td:last-child::before { content:attr(data-label); }
+  .tiger-config td:last-child br { display:none; }
+  .tiger-config td:last-child code { margin-left:8px; }
+}
+.config-code { display:block; font-size:12px; overflow-wrap:anywhere; margin:4px 0; }
+@media(min-width:1100px){.animal-card[data-code="bengal_tiger"] .detail-grid { grid-template-columns:minmax(0,2.4fr) minmax(0,1fr) minmax(0,1fr); }}
+
 /* ===== 底座速查 ===== */
 .mount-hint { font-size: 12.5px; color: rgba(30,43,36,0.72); margin: 2px 0 8px; line-height: 1.7; }
 .mount-list { list-style: none; display: grid; gap: 7px; margin-top: 2px; }
@@ -445,6 +476,77 @@ body {
   font-size: 12px; color: rgba(233,226,211,0.5);
   margin-top: 4px;
 }
+
+/* ===== 稀有度多选下拉 ===== */
+.rarity-field { min-width:0; display:flex; flex-direction:column; gap:3px; }
+.filter-label { font-size:13px; color:rgba(233,226,211,.6); letter-spacing:.05em; }
+.rarity-dropdown { position:relative; min-width:170px; max-width:100%; }
+.rarity-dropdown summary { display:flex; align-items:center; gap:10px; min-height:44px; padding:9px 12px; border:1px solid rgba(233,226,211,.22); border-radius:6px; color:var(--paper); background:rgba(233,226,211,.08); cursor:pointer; list-style:none; font:14px/1.5 var(--sans); }
+.rarity-dropdown summary::-webkit-details-marker { display:none; }
+#raritySummary { flex:1; min-width:0; max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.rarity-chevron { width:8px; height:8px; flex-shrink:0; border-right:2px solid var(--paper); border-bottom:2px solid var(--paper); transform:rotate(45deg); margin:-4px 2px 0; }
+.rarity-dropdown[open] .rarity-chevron { transform:rotate(225deg); margin:4px 2px 0; }
+.rarity-dropdown summary:focus-visible { outline:2px solid var(--safety); outline-offset:2px; }
+.rarity-menu { position:absolute; top:calc(100% + 6px); left:0; width:280px; max-width:calc(100vw - 32px); padding:8px; border:1px solid rgba(233,226,211,.3); border-radius:6px; background:var(--ink-2); color:var(--paper); box-shadow:0 8px 24px rgba(0,0,0,.3); z-index:30; }
+.rarity-dropdown.opens-up .rarity-menu { top:auto; bottom:calc(100% + 6px); }
+.rarity-menu { overflow-y:auto; }
+.rarity-menu .rarity-option { display:flex; flex-direction:row; align-items:center; gap:10px; min-height:44px; padding:8px 10px; cursor:pointer; color:var(--paper); font-size:14px; letter-spacing:0; }
+.rarity-option:hover { background:rgba(233,226,211,.08); border-radius:4px; }
+.rarity-option input { width:18px; height:18px; accent-color:var(--safety); flex-shrink:0; }
+.rarity-option input:focus-visible { outline:2px solid var(--safety); outline-offset:3px; }
+.rarity-actions { display:flex; gap:8px; padding:8px 4px 0; border-top:1px solid rgba(233,226,211,.15); }
+.rarity-actions button { flex:1; min-height:44px; background:rgba(233,226,211,.08); border:1px solid rgba(233,226,211,.22); border-radius:4px; color:var(--paper); cursor:pointer; font:14px var(--sans); }
+.rarity-actions button:focus-visible { outline:2px solid var(--safety); outline-offset:2px; }
+.rarity-help { color:rgba(233,226,211,.75); font-size:13px; padding:8px 4px 2px; }
+@media(max-width:768px){ .rarity-dropdown { width:100%; min-width:0; } .rarity-dropdown summary { font-size:14px; } }
+
+/* ===== Searchable species multi-select ===== */
+.species-field { min-width:0; display:flex; flex-direction:column; gap:3px; }
+.species-dropdown { position:relative; min-width:180px; max-width:100%; }
+.species-dropdown > summary { display:flex; align-items:center; gap:10px; min-height:44px; padding:9px 12px; border:1px solid rgba(233,226,211,.22); border-radius:6px; color:var(--paper); background:rgba(233,226,211,.08); cursor:pointer; list-style:none; font:14px/1.5 var(--sans); }
+.species-dropdown > summary::-webkit-details-marker { display:none; }
+#speciesSummary { flex:1; min-width:0; max-width:210px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.species-dropdown[open] .rarity-chevron { transform:rotate(225deg); margin:4px 2px 0; }
+.species-dropdown summary:focus-visible { outline:2px solid var(--safety); outline-offset:2px; }
+.species-menu { position:absolute; top:calc(100% + 6px); left:0; width:340px; max-width:calc(100vw - 32px); padding:10px; border:1px solid rgba(233,226,211,.3); border-radius:6px; background:var(--ink-2); color:var(--paper); box-shadow:0 8px 24px rgba(0,0,0,.3); z-index:31; }
+.species-dropdown[open] .species-menu { display:flex; flex-direction:column; }
+.species-dropdown.opens-up .species-menu { top:auto; bottom:calc(100% + 6px); }
+#speciesSearch { flex-shrink:0; width:100%; min-height:44px; padding:8px 10px; background:rgba(233,226,211,.08); border:1px solid rgba(233,226,211,.22); border-radius:4px; color:var(--paper); font:16px var(--sans); }
+#speciesSearch::placeholder { color:rgba(233,226,211,.65); }
+.species-actions { flex-shrink:0; display:flex; gap:8px; margin:8px 0; }
+.species-actions button { flex:1; min-height:44px; background:rgba(233,226,211,.08); border:1px solid rgba(233,226,211,.22); border-radius:4px; color:var(--paper); font:14px var(--sans); cursor:pointer; }
+.species-options { min-height:0; flex:1; overflow-y:auto; overscroll-behavior:contain; }
+.filters .species-option { display:flex; flex-direction:row; align-items:center; gap:10px; min-height:52px; padding:8px; font-size:14px; color:var(--paper); letter-spacing:0; cursor:pointer; }
+.species-option:hover { background:rgba(233,226,211,.08); }
+.species-option input { width:18px; height:18px; flex-shrink:0; accent-color:var(--safety); }
+.species-option > span { min-width:0; }
+.species-name { display:block; overflow-wrap:anywhere; }
+.species-code { display:block; font-size:12px; color:rgba(233,226,211,.65); overflow-wrap:anywhere; }
+.species-status,.species-empty { font-size:13px; margin:6px 4px 0; flex-shrink:0; }
+.species-menu button:focus-visible,.species-menu input:focus-visible { outline:2px solid var(--safety); outline-offset:2px; }
+@media(max-width:768px){ .species-field,.species-dropdown { width:100%; min-width:0; } }
+
+/* ===== Verified configuration evidence; reference frequency remains separate ===== */
+.config-inline { display:block; margin:4px 0 8px; padding-left:2px; font-size:14px; line-height:1.6; color:#345448; }
+.config-evidence > summary,.config-resource-list > summary { min-height:44px; display:flex; align-items:center; cursor:pointer; font-size:14px; }
+.config-evidence > p { font-size:14px; line-height:1.65; overflow-wrap:anywhere; }
+.config-entries { margin-top:14px; }
+.config-entry { padding:14px 0; border-top:1px solid rgba(30,43,36,.18); min-width:0; }
+.config-entry h4 { font-size:16px; margin:0 0 9px; }
+.config-comparison { display:grid; grid-template-columns:minmax(0,1fr); gap:7px; }
+.config-comparison > div { display:flex; flex-wrap:wrap; align-items:baseline; gap:5px 12px; padding:7px 9px; background:rgba(30,43,36,.045); min-width:0; }
+.config-comparison span,.config-mapping { font-size:14px; line-height:1.6; }
+.config-comparison strong { font-size:14px; overflow-wrap:anywhere; }
+.config-mapping code,.config-display-key,.config-path code { overflow-wrap:anywhere; white-space:normal; font-size:14px; }
+.config-resource-list { margin-top:4px; }
+.config-display-key { display:block; margin:6px 0; }
+.config-resource-list ul { list-style:none; padding:0; margin:0; }
+.config-resource-list li { display:block; padding:10px 0; margin:0; border-top:1px solid rgba(30,43,36,.12); min-width:0; }
+.config-variant-head { display:flex; flex-wrap:wrap; justify-content:space-between; gap:6px 14px; font-size:14px; line-height:1.6; }
+.config-path { display:block; margin-top:8px; min-width:0; }
+.config-path > span { display:block; font-size:14px; line-height:1.6; color:#345448; }
+.config-path > code { display:block; }
+@media(min-width:769px) { .config-comparison { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 
 /* ===== 移动端 ===== */
 @media (max-width: 768px) {
