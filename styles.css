@@ -366,6 +366,10 @@ body {
   margin-left: 5px;
 }
 .note { font-size: 12.5px; color: rgba(30,43,36,0.72); margin-top: 4px; }
+.subcat-line { font-size: 12.5px; color: rgba(30,43,36,0.72); margin: 0 0 6px; padding: 5px 10px; background: rgba(124,139,111,0.10); border-radius: 4px; }
+.subcat-line.subcat-empty { background: transparent; color: rgba(30,43,36,0.45); }
+.subcat-count { margin-left:auto; font-size: 11px; color: rgba(233,226,211,0.55); }
+.subcat-options { max-height: 240px; overflow-y: auto; }
 
 /* ===== Verified Bengal Tiger variants: bounded rows, not merged by Chinese name ===== */
 .animal-card[data-code="bengal_tiger"] .detail-grid { grid-template-columns:1fr; }

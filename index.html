@@ -9,7 +9,7 @@
 <meta name="description" content="theHunter: Call of the Wild — complete catalog of all species, rare & very rare fur types, reserve maps, and Matt mount blueprints. 全物种稀有毛色图鉴：稀有毛色、地图分布、Matt 底座蓝图。">
 <title>theHunter: Call of the Wild — Fur Tiers &amp; Mount Catalog</title>
 <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap">
-<link rel="stylesheet" href="styles.css?v=4de6af1dfbb4">
+<link rel="stylesheet" href="styles.css?v=92236454a596">
 </head>
 <body>
 
@@ -49,6 +49,17 @@
       <label><span data-i18n="lblFamily">动物类别</span>
         <select id="fFamily"><option value="">全部</option></select>
       </label>
+      <div class="rarity-field subcat-field">
+        <span class="filter-label" id="subcatLabel" data-i18n="lblSubcat">子分类</span>
+        <details id="fSubcats" class="rarity-dropdown">
+          <summary aria-labelledby="subcatLabel subcatSummary" aria-controls="subcatMenu"><span id="subcatSummary">全部子分类</span><span class="rarity-chevron" aria-hidden="true"></span></summary>
+          <div id="subcatMenu" class="rarity-menu" role="group" aria-labelledby="subcatLabel">
+            <div id="subcatOptions" class="subcat-options"></div>
+            <div class="rarity-actions"><button type="button" id="subcatAll" data-i18n="subcatAll">全选</button><button type="button" id="subcatClear" data-i18n="rarityClear">清空</button></div>
+            <p class="rarity-help" data-i18n="subcatOr">可多选，所选子分类取“或”。依据：战利品管理器筛选规则与物种标签链（游戏资源）。</p>
+          </div>
+        </details>
+      </div>
       <div class="species-field">
         <span class="filter-label" id="speciesLabel" data-i18n="lblSpecies">物种</span>
         <details id="fSpecies" class="species-dropdown">
@@ -150,8 +161,8 @@
 </footer>
 
 <script src="data.js?v=46a4ef8f5345"></script>
-<script src="game-filters.js?v=cbb3968699f3"></script>
+<script src="game-filters.js?v=7c1c4afb87c3"></script>
 <script src="manager-rarity.js?v=05a47f0da29a"></script>
-<script src="app.js?v=0b4d5f83a26d"></script>
+<script src="app.js?v=c925c6a3d75f"></script>
 </body>
 </html>

@@ -5,6 +5,7 @@
   var manager = window.MANAGER_RARITY || {labels:{},species:{}};
   var LANG = "en";
   var game = window.GAME_FILTERS || {groups:{},animals:{}};
+  var subcats = window.GAME_SUBCATEGORIES || {groups:{},order:[],animals:{},unbound:{}};
   var GROUP_ORDER = ["birds","mammals","reptiles","other"];
   function infoOf(a){return game.animals[a.code] || {group:null,animalClass:null,classStatus:"unverified",sources:[]};}
   function groupOf(a){return infoOf(a).group;}
@@ -68,6 +69,11 @@
     rarityGO: { en: "Great One", zh: "传奇" },
     raritySelectAll: { en: "Select all", zh: "全选" },
     rarityClear: { en: "Clear", zh: "清空" },
+    lblSubcat: { en: "Subcategory", zh: "子分类" },
+    subcatAll: { en: "Select all", zh: "全选" },
+    subcatNone: { en: "No subcategory", zh: "无子分类" },
+    subcatEmpty: { en: "No game-data subcategory", zh: "无游戏数据子分类" },
+    subcatAllLabel: { en: "All subcategories", zh: "全部子分类" },
     rarityNone: { en: "Select rarity", zh: "请选择稀有度" },
     rarityOr: { en: "Multi-select: selected rarities combine with OR.", zh: "可多选，所选等级取“或”。" },
     optSortFamily: { en: "Type · Name", zh: "类别 · 名称" },
@@ -226,6 +232,9 @@
   function nameOf(a) { return LANG === "en" ? (EN_SPECIES[a.code] || a.code) : a.zh; }
   function familyOf(a) { var g=game.groups[groupOf(a)];return g?g[LANG]:T("noGroup"); }
   function groupLabel(key){var g=game.groups[key];return g?g[LANG]:key;}
+  function subcatsOf(a){return subcats.animals[a.code]||[];}
+  function subcatLabel(key){var g=subcats.groups[key];return g?g[LANG]:key;}
+  function subcatCount(k){return data.filter(function(a){return subcatsOf(a).indexOf(k)>=0;}).length;}
   function mapBase(m) { return LANG === "en" ? (EN_MAP[m] || m) : (MAP_DISPLAY[m] || m); }
   function mapDisplay(m) {
     if (LANG === "en") return mapBase(m) + (EN_MAP_SUFFIX[m] || "");
@@ -252,7 +261,7 @@
   };
 
   var state = {
-    q: "", family: "", species: null, map: "", rarities: ["common", "uncommon", "rare", "veryrare", "fabled", "pending"], animalClass:"", sort: "family",
+    q: "", family: "", species: null, map: "", rarities: ["common", "uncommon", "rare", "veryrare", "fabled", "pending"], animalClass:"", subcats: null, sort: "family",
     open: {}
   };
 
@@ -266,6 +275,7 @@
     fMap: document.getElementById("fMap"),
     fClass: document.getElementById("fClass"),
     fRarity: document.getElementById("fRarity"),
+    fSubcats: document.getElementById("fSubcats"),
     fSort: document.getElementById("fSort"),
     btnReset: document.getElementById("btnReset"),
     btnLang: document.getElementById("btnLang"),
@@ -460,6 +470,34 @@
     positionRarityMenu();
   }
   // Legacy rows use reference tier words; verified rows carry stable ids independently of display language.
+  var SUBCAT_ORDER = subcats.order.length ? subcats.order : [];
+  function renderSubcatOptions() {
+    if(!el.fSubcats) return;
+    var opts=SUBCAT_ORDER.map(function(k){
+      var g=subcats.groups[k]||{}, label=g[LANG]||k;
+      return '<label class="rarity-option"><input type="checkbox" value="'+escAttr(k)+'"'+(state.subcats===null||state.subcats.indexOf(k)>=0?' checked':'')+'><span>'+esc(label)+'</span> <span class="subcat-count">'+subcatCount(k)+'</span></label>';
+    }).join("");
+    document.getElementById("subcatOptions").innerHTML = opts;
+  }
+  function positionSubcatMenu() {
+    if(!el.fSubcats || !el.fSubcats.open) return;
+    var menu=document.getElementById("subcatMenu"), control=el.fSubcats.getBoundingClientRect();
+    menu.style.maxHeight="";menu.style.left="0px";
+    var natural=menu.scrollHeight, below=Math.max(0,innerHeight-control.bottom-14), above=Math.max(0,control.top-14);
+    var upwards=below<natural && above>below;
+    el.fSubcats.classList.toggle("opens-up",upwards);
+    menu.style.maxHeight=Math.max(44,Math.min(natural,upwards?above:below))+"px";
+    var rect=menu.getBoundingClientRect();
+    if(rect.right>innerWidth-16)menu.style.left=Math.min(0,innerWidth-16-rect.right)+"px";
+  }
+  function syncSubcatControl() {
+    if(!el.fSubcats) return;
+    Array.prototype.forEach.call(el.fSubcats.querySelectorAll('input[type="checkbox"]'), function (box) { box.checked = state.subcats===null || state.subcats.indexOf(box.value) >= 0; });
+    var summary=document.getElementById("subcatSummary");
+    summary.textContent = state.subcats===null ? T("subcatAllLabel") : (state.subcats.length ? state.subcats.map(subcatLabel).join(" / ") : T("subcatNone"));
+    summary.title = summary.textContent;
+    positionSubcatMenu();
+  }
   var LEGACY_RARITY_IDS = {"稀有":"rare", "极稀有":"veryrare"};
   function rarityId(r) { return r[2] && r[2].rarityId ? r[2].rarityId : LEGACY_RARITY_IDS[r[1]]; }
   function mainRarityText(r) { return gradeName(r[1]); }
@@ -505,6 +543,11 @@
   function matches(a) {
     if (!speciesSelected(a.code)) return false;
     if (state.family && groupOf(a) !== state.family) return false;
+    if(state.subcats!==null){
+      var scs=subcatsOf(a);
+      if(!state.subcats.length) return false;
+      if(!scs.some(function(s){return state.subcats.indexOf(s)>=0;})) return false;
+    }
     if(state.animalClass && (state.animalClass==="unknown"?classOf(a)!=null:String(classOf(a))!==state.animalClass))return false;
     if (state.map && a.maps.indexOf(state.map) < 0) return false;
     if (!hasSelectedRarity(a)) return false;
@@ -831,6 +874,10 @@
       } else {
         rowMount = '<span class="chip chip-none">' + esc(T("noMountRow")) + '</span>';
       }
+      var subTags = subcatsOf(a);
+      var subRow = subTags.length
+        ? '<p class="subcat-line"><strong>'+esc(T("lblSubcat"))+'</strong>: '+subTags.map(subcatLabel).join(" / ")+' <span class="views-note" title="'+escAttr(LANG==="en"?"Trophy Manager filter rule vs species tag chain (game assets); multi-membership is the literal rule result.":"战利品管理器筛选规则×物种标签链（游戏资源）；多重归属为筛选规则字面结果。")+'">*</span></p>'
+        : '<p class="subcat-line subcat-empty">'+esc(T("subcatEmpty"))+'</p>';
       return '<div class="animal-card' + open + '" data-code="' + escAttr(a.code) + '">' +
         '<div class="animal-row">' +
           '<span class="fam-tag">' + esc(familyOf(a)) + "</span>" +
@@ -845,6 +892,7 @@
           "</span>" +
         "</div>" +
         '<div class="detail">' +
+          subRow +
           '<div class="detail-grid">' +
             '<div class="manager-furs">'+managerFurMarkup(a)+'<details class="legacy-references"><summary>'+esc(T("referenceDetails"))+'</summary><h3>'+esc(T("dRareFurs"))+' · '+referenceRowCount(a)+'</h3><ul'+(a.gameFurEvidence?' class="tiger-fur-list"':'')+'>'+rareLis+'</ul>'+(goLis?'<h3>'+esc(T("dGoFurs"))+' · '+(a.go||[]).length+'</h3><ul>'+goLis+'</ul><p class="views-note">'+esc(goNameEvidenceNote(a))+'</p>':'')+'</details></div>'+
             "<div><h3>" + esc(T("dReserves")) + "</h3><ul>" + mapLis + "</ul></div>" +
@@ -887,6 +935,7 @@
   function apply() {
     syncSpeciesControl();
     syncRarityControl();
+    syncSubcatControl();
     var list = filtered();
     renderSummary(list);
     renderSide();
@@ -944,10 +993,30 @@
     });
     document.addEventListener("click",function(e){if(!el.fRarity.contains(e.target))el.fRarity.open=false;});
     document.addEventListener("focusin",function(e){if(!el.fRarity.contains(e.target))el.fRarity.open=false;});
+    if(el.fSubcats){
+      el.fSubcats.addEventListener("change", function (e) {
+        if(e.target.type !== "checkbox") return;
+        var k=e.target.value;
+        if(state.subcats===null)state.subcats=SUBCAT_ORDER.slice();
+        if(e.target.checked && state.subcats.indexOf(k)<0)state.subcats.push(k);
+        if(!e.target.checked)state.subcats=state.subcats.filter(function(x){return x!==k;});
+        if(state.subcats.length===SUBCAT_ORDER.length)state.subcats=null;
+        apply();
+      });
+      document.getElementById("subcatAll").addEventListener("click",function(){state.subcats=null;apply();});
+      document.getElementById("subcatClear").addEventListener("click",function(){state.subcats=[];apply();});
+      el.fSubcats.addEventListener("toggle",positionSubcatMenu);
+      el.fSubcats.querySelector("summary").addEventListener("click",function(){el.fRarity.open=false;el.fSpecies.open=false;requestAnimationFrame(positionSubcatMenu);});
+      window.addEventListener("resize",positionSubcatMenu);
+      window.addEventListener("scroll",positionSubcatMenu,{passive:true});
+      el.fSubcats.addEventListener("keydown",function(e){if(e.key==="Escape" && el.fSubcats.open){el.fSubcats.open=false;el.fSubcats.querySelector("summary").focus();e.stopPropagation();}});
+      document.addEventListener("click",function(e){if(!el.fSubcats.contains(e.target))el.fSubcats.open=false;});
+      document.addEventListener("focusin",function(e){if(!el.fSubcats.contains(e.target))el.fSubcats.open=false;});
+    }
     el.fSort.addEventListener("change", function () { state.sort = el.fSort.value; apply(); });
     el.btnReset.addEventListener("click", function () {
-      state = { q: "", family: "", species:null, map: "", rarities: RARITY_KEYS.slice(), animalClass:"", sort: "family", open: {} };
-      el.q.value = ""; el.fFamily.value = ""; el.fMap.value = ""; el.fRarity.open=false; el.fSort.value = "family";el.fClass.value="";speciesQuery="";el.speciesSearch.value="";el.fSpecies.open=false;renderSpeciesOptions();
+      state = { q: "", family: "", species:null, map: "", rarities: RARITY_KEYS.slice(), animalClass:"", subcats:null, sort: "family", open: {} };
+      el.q.value = ""; el.fFamily.value = ""; el.fMap.value = ""; el.fRarity.open=false; el.fSort.value = "family";el.fClass.value="";speciesQuery="";el.speciesSearch.value="";el.fSpecies.open=false;if(el.fSubcats)el.fSubcats.open=false;renderSpeciesOptions();
       apply();
     });
     el.btnLang.addEventListener("click", function () {
@@ -955,6 +1024,7 @@
       hayCache = {};
       updateStatic();
       rebuildSelects();
+      renderSubcatOptions();
       renderHeroStats();
       renderMountCatalog();
       apply();
@@ -965,6 +1035,7 @@
   }
 
   rebuildSelects();
+  renderSubcatOptions();
   renderHeroStats();
   updateStatic();
   bind();
