@@ -2,6 +2,7 @@
 (function () {
   "use strict";
   var data = window.ANIMALS || [];
+  var manager = window.MANAGER_RARITY || {labels:{},species:{}};
   var LANG = "en";
   var game = window.GAME_FILTERS || {groups:{},animals:{}};
   var GROUP_ORDER = ["birds","mammals","reptiles","other"];
@@ -39,11 +40,13 @@
 
   /* ---- 双语字典 ---- */
   var I18N = {
-    heroTitle: { en: "Rare Fur & Mount Catalog", zh: "全物种稀有毛色图鉴" },
-    heroSub: { en: "127 species · rare furs · reserves · Matt mount blueprints — every hunt worth taking, at a glance", zh: "127 种动物 · 稀有毛色 · 地图分布 · Matt 底座蓝图 —— 一站查清值得打的每一只" },
-    lgRare: { en: "Rare fur (0.1%–1%)", zh: "稀有毛色（0.1%–1%）" },
-    lgVeryrare: { en: "Very rare fur (<0.1%)", zh: "极稀有毛色（<0.1%）" },
-    lgGo: { en: "GO fur records", zh: "GO毛色资料" },
+    rarityCommon:{en:"Common",zh:"普通"},rarityUncommon:{en:"Uncommon",zh:"少有"},rarityFabled:{en:"Fabled",zh:"珍稀"},rarityPending:{en:"Binding pending",zh:"绑定待核"},
+    stPendingSpecies:{en:"Species binding pending",zh:"物种绑定待核"},sumResources:{en:"Selected resource records",zh:"所选资源记录"},referenceDetails:{en:"Existing references · separate from manager tiers",zh:"原有参考 · 与管理器五档分开"},
+    heroTitle: { en: "Fur Tiers & Mount Catalog", zh: "全物种毛色等级图鉴" },
+    heroSub: { en: "127 species · Trophy Manager five-tier grades · reserves · Matt mounts", zh: "127 种动物 · 管理器五档毛色 · 地图分布 · Matt 底座" },
+    lgRare: { en: "Rare · manager value 2", zh: "稀有 · 管理器值 2" },
+    lgVeryrare: { en: "Very Rare · manager value 3", zh: "罕见 · 管理器值 3" },
+    lgGo: { en: "Fabled · manager value 4", zh: "珍稀 · 管理器值 4" },
     lgGoShort: { en: "GO", zh: "传奇" },
     tabAnimals: { en: "Species", zh: "动物图鉴" },
     tabMounts: { en: "Mounts", zh: "底座总览" },
@@ -56,12 +59,12 @@
     noSpeciesOptions: { en: "No matching species", zh: "没有匹配的物种" },
     lblRarity: { en: "Rarity", zh: "稀有度" },
     lblSort: { en: "Sort", zh: "排序" },
-    optRareAll: { en: "All rare & above", zh: "全部稀有以上" },
+    optRareAll: { en: "All tiers + pending", zh: "全部档位与待核" },
     optAll: { en: "All", zh: "全部" },
     optRare: { en: "Rare only", zh: "仅含稀有" },
     optVeryrare: { en: "Very rare only", zh: "仅含极稀有" },
     rarityRare: { en: "Rare", zh: "稀有" },
-    rarityVeryrare: { en: "Very Rare", zh: "极稀有" },
+    rarityVeryrare: { en: "Very Rare", zh: "罕见" },
     rarityGO: { en: "Great One", zh: "传奇" },
     raritySelectAll: { en: "Select all", zh: "全选" },
     rarityClear: { en: "Clear", zh: "清空" },
@@ -69,7 +72,7 @@
     rarityOr: { en: "Multi-select: selected rarities combine with OR.", zh: "可多选，所选等级取“或”。" },
     optSortFamily: { en: "Type · Name", zh: "类别 · 名称" },
     optSortName: { en: "Name", zh: "名称" },
-    optSortCount: { en: "Rare count", zh: "稀有毛色数" },
+    optSortCount: { en: "Verified fur name count", zh: "已核毛色名称数" },
     btnReset: { en: "Reset", zh: "重置" },
     phSearch: { en: "Search species or code, e.g. blue_sheep", zh: "搜索动物名称或代码，如 蓝羊 / blue_sheep" },
     ptFamilies: { en: "Animal types", zh: "动物类别" },
@@ -85,10 +88,10 @@
     stSpecies: { en: "Species", zh: "物种总数" },
     stFamilies: { en: "Animal types", zh: "动物类别" },
     stMaps: { en: "Reserves", zh: "地图" },
-    stRareEntries: { en: "Rare+ name entries", zh: "稀有以上名称条目" },
+    stRareEntries: { en: "Verified fur name keys", zh: "已核毛色名称键" },
     stGOSpecies: { en: "Species with GO records", zh: "收录GO资料的物种" },
     sumCurrent: { en: "Current species", zh: "当前物种" },
-    sumRare: { en: "Rare+ name entries", zh: "稀有以上名称条目" },
+    sumRare: { en: "Selected fur name keys", zh: "所选毛色名称键" },
     sumMaps: { en: "Reserves", zh: "覆盖地图" },
     sumGO: { en: "Species with GO records", zh: "有GO资料的物种" },
     mHintNoMap1: { en: "species have multi-animal mounts;", zh: "种动物有多动物底座；" },
@@ -99,8 +102,8 @@
     mHintList1: { en: "species with mounts:", zh: "种动物可做底座：" },
     mNoMountMore: { en: "Plus", zh: "另有" },
     mNoMountNo: { en: "species without mounts:", zh: "种暂无底座：" },
-    dRareFurs: { en: "Rare+ Furs", zh: "稀有以上毛色" },
-    dGoFurs: { en: "Great One Furs", zh: "传奇(GO)毛色" },
+    dRareFurs: { en: "Historical frequency references", zh: "原有频率参考" },
+    dGoFurs: { en: "Existing GO name references", zh: "既有 GO 名称参考" },
     dReserves: { en: "Reserves", zh: "出现地图" },
     dMounts: { en: "Matt Mount Blueprints", zh: "Matt 底座蓝图" },
     noMountDetail: { en: "No official multi-mount for this species (as of Patch 9.2)", zh: "官方暂无该物种多功能底座（截至 Patch 9.2）" },
@@ -111,7 +114,7 @@
     lblClass:{en:"Animal Class",zh:"动物等级"},classUnknown:{en:"Class unverified",zh:"等级待核实"},classConflict:{en:"Class sources disagree; unverified",zh:"等级来源冲突，待核实"},filterHelp:{en:"Selections within Species or Rarity combine with OR; different filters combine with AND. Animal Class is not difficulty or a medal.",zh:"物种或稀有度各自多选取“或”，不同筛选取“且”；动物等级不是难度或奖牌。"},noGroup:{en:"No species in the current catalog",zh:"当前图鉴暂无该类物种"},classSources:{en:"Class sources",zh:"等级来源"},
     footClasses: {en:"Animal types follow the four Trophy Manager groups. Animal Class uses public references (The Wild Register / TacMaps and CoTW Guide), not difficulty or medals; unresolved entries stay unverified.",zh:"动物类别对齐战利品管理器四大类。动物等级来自 The Wild Register / TacMaps、CoTW Guide 公共参考，不是难度或奖牌；缺少依据及冲突条目保留待核实。"},
     footSrc: { en: "Sources: gameslikefinder Rare Fur Types List (2026-06-24, 20 reserves) · thewildregister.com / TacMaps (vicuña) · Matt mount blueprints from thehuntercotw.wordpress.com (2025-07-06).", zh: "数据源：gameslikefinder《Rare Fur Types List》（2026-06-24，20 张地图）· thewildregister.com / TacMaps（骆马）· Matt 底座蓝图来自 thehuntercotw.wordpress.com（2025-07-06）。" },
-    footNote: { en: "Release updated 2026-10-26. Game subcategory filters are not yet available; sex labels retain the existing reference data.", zh: "更新于2026-10-26。游戏二级分类筛选尚未提供；性别标签沿用现有参考资料。" }
+    footNote: { en: "Local five-tier preview, not published. Static current-installation rule verified; unresolved bindings stay pending. No live manager sampling or game writes.", zh: "五档本地预览，未发布。当前安装版本静态转换规则已核，未绑定条目保留待核；未采样实机管理器输出，未写游戏。" }
   };
 
   var EN_FAMILY = {
@@ -127,7 +130,7 @@
     "育空河谷": "Yukon Valley", "夸特罗·科利纳斯野生动物保护区": "Cuatro Colinas", "密西西比阿克里斯保护区": "Mississippi Acres Preserve",
     "新英格兰山脉": "New England Mountains", "阿罗约牧场": "Rancho del Arroyo", "蒂阿拉罗瓦国家公园": "Te Awaroa National Park",
     "雷文图里海岸": "Revontuli Coast", "翡翠海岸": "Emerald Coast", "桑达帕坦": "Sundarpatan",
-    "萨尔茨维森公园": "Salzwiesen Park", "阿尔伯塔狩猎保护区": "Askiy Ridge", "托尔南西恩": "Torr nan Sithean",
+    "萨尔茨维森公园": "Salzwiesen Park", "阿尔伯塔狩猎保护区": "Askiy Ridge Hunting Preserve", "托尔南西恩": "Tòrr nan Sìthean Hunting Estate",
     "因蒂苏尤": "Intisuyu"
   };
   var EN_MAP_SUFFIX = { "因蒂苏尤": " (Peru)", "托尔南西恩": " (Scotland)" };
@@ -223,7 +226,7 @@
   function nameOf(a) { return LANG === "en" ? (EN_SPECIES[a.code] || a.code) : a.zh; }
   function familyOf(a) { var g=game.groups[groupOf(a)];return g?g[LANG]:T("noGroup"); }
   function groupLabel(key){var g=game.groups[key];return g?g[LANG]:key;}
-  function mapBase(m) { return LANG === "en" ? (EN_MAP[m] || m) : m; }
+  function mapBase(m) { return LANG === "en" ? (EN_MAP[m] || m) : (MAP_DISPLAY[m] || m); }
   function mapDisplay(m) {
     if (LANG === "en") return mapBase(m) + (EN_MAP_SUFFIX[m] || "");
     return MAP_DISPLAY[m] || m;
@@ -239,15 +242,17 @@
 
   var MAP_WORDS = {
     "因蒂苏尤": ["秘鲁", "peru", "intisuyu", "因蒂苏尤"],
-    "托尔南西恩": ["苏格兰", "scotland", "torr nan sithean", "托尔南西恩"]
+    "托尔南西恩": ["苏格兰", "scotland", "torr nan sithean", "托尔南西恩", "精灵之丘狩猎庄园"],
+    "阿尔伯塔狩猎保护区": ["阿尔伯塔", "alberta", "askiy ridge", "阿斯基岭狩猎保护区"]
   };
   var MAP_DISPLAY = {
     "因蒂苏尤": "因蒂苏尤（秘鲁）",
-    "托尔南西恩": "托尔南西恩（苏格兰）"
+    "托尔南西恩": "精灵之丘狩猎庄园",
+    "阿尔伯塔狩猎保护区": "阿斯基岭狩猎保护区"
   };
 
   var state = {
-    q: "", family: "", species: null, map: "", rarities: ["rare", "veryrare", "go"], animalClass:"", sort: "family",
+    q: "", family: "", species: null, map: "", rarities: ["common", "uncommon", "rare", "veryrare", "fabled", "pending"], animalClass:"", sort: "family",
     open: {}
   };
 
@@ -296,8 +301,10 @@
   function searchHay(a) {
     if (hayCache[a.code] && hayCache[a.code].l === LANG) return hayCache[a.code].s;
     var parts = [a.zh, (EN_SPECIES[a.code] || ""), a.code, familyOf(a), a.family, (EN_FAMILY[a.family] || "")].concat(a.maps, a.nameAliases || []);
+    managerInfo(a).rows.forEach(function(r){parts.push(r.zh,r.en,r.displayKey);});
     a.maps.forEach(function (m) {
       if (EN_MAP[m]) parts.push(EN_MAP[m]);
+      if (MAP_DISPLAY[m]) parts.push(MAP_DISPLAY[m]);
       if (MAP_WORDS[m]) parts = parts.concat(MAP_WORDS[m]);
     });
     a.rare.forEach(function (r) {
@@ -382,13 +389,24 @@
     renderSpeciesOptions();
   }
 
-  function hasGO(a) { return (a.go && a.go.length > 0) || /传奇毛色/.test(a.note || ""); }
+  function hasResourceGO(a) {
+    var info=managerInfo(a);
+    if(isPending(a)) return false;
+    return info.rows.some(function(r){
+      return r.rarityId==="fabled" && r.rarity===4 && r.status==="static-rule-verified" &&
+        r.variants.length>0 && r.variants.every(function(v){
+          return v.type_rarity===3 && v.flag_raw!==0 && v.manager_value_from_static_rule===4;
+        });
+    });
+  }
+  function hasGO(a) { return hasResourceGO(a) || (a.go && a.go.length > 0) || /传奇毛色/.test(a.note || ""); }
   // 官方来源确认 GO（存在级官方证据；社区/存疑/待核不计入）
   var OFFICIAL_GO = { black_bear:1, gray_wolf:1, jaguar:1, moose:1, mule_deer:1, roe_deer:1, tahr:1, whitetail_deer:1, wild_boar:1 };
   var COMMUNITY_GO = { red_deer:1, fallow_deer:1, ring_necked_pheasant:1 };
   function hasOfficialGO(a){ return !!OFFICIAL_GO[a.code]; }
-  function hasEvidenceGO(a){ return hasOfficialGO(a) || !!COMMUNITY_GO[a.code]; }
+  function hasEvidenceGO(a){ return hasResourceGO(a) || hasOfficialGO(a) || !!COMMUNITY_GO[a.code]; }
   function goTierLabel(a){
+    if (hasResourceGO(a)) return LANG === "en" ? "GO · game resources" : "GO · 游戏资源已核";
     if (hasOfficialGO(a)) return LANG === "en" ? "GO official" : "GO官方";
     if (!!COMMUNITY_GO[a.code]) return LANG === "en" ? "GO community" : "GO社区";
     return LANG === "en" ? "GO unverified" : "GO待核";
@@ -396,6 +414,16 @@
   var VERIFIED_GO_DISPLAY = { tahr:1, wild_boar:1, gray_wolf:1, moose:1, ring_necked_pheasant:1, red_fox:1, mule_deer:1, fallow_deer:1, black_bear:1 };
   function goDisplayVerified(a,g){ return !!VERIFIED_GO_DISPLAY[a.code] && !!g.z; }
   function goNameEvidenceNote(a){
+    if(a.code==="tahr" && hasResourceGO(a)) {
+      return LANG === "en" ?
+        "All seven Fabled resource and display-name bindings are verified. Male symbols below are preserved legacy references, not a verified male-only runtime restriction. The original configuration records gender=1 for all seven; its enum meaning and runtime eligibility have not been established by this audit." :
+        "七条珍稀毛色的资源及名称关联已核。下列雄性符号保留自旧参考，不作为实机“仅限雄性”的已证规则。七条原配置均为 gender=1；本次尚未核实其枚举含义和运行时性别限制。";
+    }
+    if(hasResourceGO(a)) {
+      return LANG === "en" ?
+        "The current game configuration includes verified Fabled resources for this species, shown in the five-tier list above. The legacy reference list is retained separately; this does not claim that every legacy entry, suffix or sex restriction is individually resource-bound." :
+        "当前游戏配置已核实该物种的珍稀资源，详见上方五档列表。此处旧参考单独保留，不代表其中每条名称、编号后缀或性别限制均已逐项完成资源绑定。";
+    }
     var verified=!!VERIFIED_GO_DISPLAY[a.code];
     var nameNote=a.code === "tahr"
       ? (LANG === "en" ? "The species-configuration and EN/ZH display-key bindings have been verified for all seven Great One fur entries." : "七条传奇毛色的物种配置与中英文显示键关联已核实。")
@@ -411,8 +439,8 @@
     return [nameNote,existence,suffix].filter(Boolean).join(" ");
   }
 
-  var RARITY_KEYS = ["rare", "veryrare", "go"];
-  var RARITY_TEXT = {rare:"rarityRare", veryrare:"rarityVeryrare", go:"rarityGO"};
+  var RARITY_KEYS = ["common", "uncommon", "rare", "veryrare", "fabled", "pending"];
+  var RARITY_TEXT = {common:"rarityCommon",uncommon:"rarityUncommon",rare:"rarityRare",veryrare:"rarityVeryrare",fabled:"rarityFabled",pending:"rarityPending"};
   function positionRarityMenu() {
     if(!el.fRarity.open) return;
     var menu=document.getElementById("rarityMenu"), control=el.fRarity.getBoundingClientRect();
@@ -427,21 +455,52 @@
   function syncRarityControl() {
     Array.prototype.forEach.call(el.fRarity.querySelectorAll('input[type="checkbox"]'), function (box) { box.checked = state.rarities.indexOf(box.value) >= 0; });
     var summary=document.getElementById("raritySummary");
-    summary.textContent = state.rarities.length === 3 ? T("optRareAll") : (state.rarities.length ? state.rarities.map(function(k){return T(RARITY_TEXT[k]);}).join(" / ") : T("rarityNone"));
+    summary.textContent = state.rarities.length === RARITY_KEYS.length ? T("optRareAll") : (state.rarities.length ? state.rarities.map(function(k){return T(RARITY_TEXT[k]);}).join(" / ") : T("rarityNone"));
     summary.title = summary.textContent;
     positionRarityMenu();
   }
   // Legacy rows use reference tier words; verified rows carry stable ids independently of display language.
   var LEGACY_RARITY_IDS = {"稀有":"rare", "极稀有":"veryrare"};
   function rarityId(r) { return r[2] && r[2].rarityId ? r[2].rarityId : LEGACY_RARITY_IDS[r[1]]; }
+  function mainRarityText(r) { return gradeName(r[1]); }
   function rowFurName(a, r) { return r[2] ? (LANG === "en" ? r[2].en : r[0]) : furName(a,r[0]); }
-  function furRowCount(a) { return a.rare.length; }
-  function furNameCount(a) { return unique(a.rare.map(function(r){return r[2] ? r[2].displayKey : r[0];})).length; }
+  function referenceRowCount(a) { return a.rare.length; }
+  function referenceNameCount(a) { return unique(a.rare.map(function(r){return r[2] ? r[2].displayKey : r[0];})).length; }
+  function managerInfo(a) {
+    var info=manager.species[a.code];
+    if(!info) return {status:"species-binding-pending",rows:[]};
+    if(info.status!=="shared-reserve-config") return info;
+    var group=(manager.sharedGroups || {})[info.configSpecies], source=manager.species[info.sharedWith];
+    if(!group || group.canonicalCode!==info.sharedWith || group.catalogCodes.indexOf(a.code)<0 || !source ||
+       (source.status!=="exact-species-code" && source.status!=="resource-identity-verified") || source.configSpecies!==info.configSpecies) {
+      return {status:"species-binding-pending",rows:[]};
+    }
+    return {status:info.status,configSpecies:source.configSpecies,sharedWith:info.sharedWith,
+      rows:source.rows,resourceCount:source.resourceCount,bindingEvidence:info.bindingEvidence};
+  }
+  function managerSharedNote(a) {
+    var info=managerInfo(a), group=(manager.sharedGroups || {})[info.configSpecies];
+    if(!group || group.catalogCodes.indexOf(a.code)<0) return "";
+    var text=LANG==="en" ? "Shared configuration: Wild Hog / Feral Pig. Both map records are retained; fur resources use one configuration and are counted once in combined statistics. The Mississippi reserve object links wildhog spawn maps to Feral Pig behavior. Static association only; runtime overrides have not been sampled." :
+      "共享配置：美洲野猪／野化猪。两条地图记录保留，毛色引用同一套配置，合并统计只计一次。密西西比配置对象将 wildhog 生成图与 Feral Pig 行为关联；依据为静态配置，未采样实机覆盖规则。";
+    if(info.configSpecies==="wild_turkey") {
+      text=LANG==="en" ? "Shared configuration: Wild Turkey / Merriam's Turkey. Both map records are retained; these six resources use one configuration and are counted once in combined statistics. The Te Awaroa object links Wild Turkey spawn maps to wild_turkey behavior; the canonical animal name key identifies Merriam Turkey. Static reserve association only; runtime overrides have not been sampled." :
+        "共享配置：火鸡／梅里亚姆火鸡。两条地图记录保留，共用同一套6条资源，合并统计只计一次。蒂阿拉罗瓦对象将 Wild Turkey 生成图与 wild_turkey 行为关联，该动物定义名称键对应梅里亚姆火鸡；依据限静态保护区配置，未采样实机覆盖规则。";
+    }
+    return '<p class="manager-shared-note manager-method" data-shared-config="'+escAttr(info.configSpecies)+'">'+esc(text)+'</p>';
+  }
+  function managerRows(a, selectedOnly) {
+    var rows=managerInfo(a).rows;
+    return selectedOnly ? rows.filter(function(r){return state.rarities.indexOf(r.rarityId)>=0;}) : rows;
+  }
+  function furRowCount(a) { return managerRows(a,true).length; }
+  function furNameCount(a) { return unique(managerRows(a,true).map(function(r){return r.displayKey;})).length; }
+  function managerTierText(id) { return T(RARITY_TEXT[id] || "rarityPending"); }
+  function isPending(a) { var s=managerInfo(a).status; return s!=="exact-species-code" && s!=="resource-identity-verified" && s!=="shared-reserve-config"; }
+
   function hasSelectedRarity(a) {
-    return state.rarities.some(function(k){
-      if(k === "go") return hasGO(a);
-      return a.rare.some(function(r){return rarityId(r) === k;});
-    });
+    if(isPending(a)) return state.rarities.indexOf("pending")>=0;
+    return managerRows(a,true).length>0;
   }
   function matches(a) {
     if (!speciesSelected(a.code)) return false;
@@ -471,41 +530,64 @@
     });
   }
 
+  /* Exact config resource -> manager tier; old frequency/name references stay separate. */
+  function managerFurMarkup(a) {
+    var en=LANG==="en", rows=managerRows(a,true),info=managerInfo(a);
+    var title=en?"Furs · Trophy Manager tiers":"毛色 · 战利品管理器五档";
+    var lead='<h3>'+esc(title)+'</h3>'+managerSharedNote(a);
+    if(isPending(a)) return lead+'<p class="manager-pending">'+esc(en?"Species-resource binding pending. Existing references remain below; no five-tier value has been assumed.":"物种与资源绑定待核，现有参考保留在下方；未推定五档等级。")+'</p>';
+    var keys=unique(rows.map(function(r){return r.displayKey;})).length;
+    var resourceCount=rows.reduce(function(n,r){return n+r.variants.length;},0);
+    lead+='<p class="manager-count">'+keys+' '+esc(en?"display keys":"显示名称键")+' / '+resourceCount+' '+esc(en?"resource records · selected tiers only":"资源记录 · 仅显示所选档位")+'</p>';
+    var lis=rows.map(function(r){
+      var name=en?r.en:r.zh,secondary=en?"":'<span class="manager-en">'+esc(r.en)+'</span>';
+      var textPending=r.textStatus!=="original-text-bytes-verified"?'<span class="manager-text-pending">'+esc(en?"Display text unresolved":"译词待核")+'</span>':"";
+      var ids=r.indices.map(function(i){return "#"+i;}).join(" / ");
+      var variantTag=a.code==="bengal_tiger" && (r.indices[0]===8 || r.indices[0]===9)?"02 · ":"";
+      var resources=r.variants.map(function(v){
+        var paths=[v.malePath,v.femalePath].filter(Boolean).map(function(p){return '<code class="manager-path">'+esc(p)+'</code>';}).join("");
+        return '<li><strong>#'+v.index+'</strong> · type_rarity='+v.type_rarity+' · flag='+v.flag_raw+' → m_Rarity='+v.manager_value_from_static_rule+paths+'</li>';
+      }).join("");
+      return '<li class="manager-fur-row" data-manager-rarity="'+r.rarity+'" data-display-key="'+escAttr(r.displayKey)+'" data-variant-indices="'+r.indices.join(',')+'"><span class="grade manager-grade-'+r.rarityId+'">'+esc(managerTierText(r.rarityId))+'</span><span class="manager-fur-name"><strong>'+esc(name)+'</strong>'+secondary+textPending+'</span><span class="manager-index">'+esc(variantTag+ids)+'</span><details class="manager-resources"><summary>'+esc(en?"Resource evidence":"资源依据")+'</summary><code class="manager-key">'+esc(r.displayKey)+'</code><ul>'+resources+'</ul></details></li>';
+    }).join("");
+    return lead+'<ul class="manager-fur-list">'+lis+'</ul><p class="manager-method">'+esc(en?"Current installation: static resource → manager data-construction rule verified. Tier labels do not imply spawn percentages. A shared display key can occupy different tiers; resource numbers are not new color names. Live manager outputs and appearance are not tested.":"当前安装版本：已核资源到管理器数据构造的静态规则。等级不表示生成百分比；同显示键可能归入不同档位，资源编号不另算新毛色名。尚未采样实机管理器输出及外观。")+'</p>';
+  }
+  function managerStats(list, selectedOnly) {
+    var result={keys:0,resources:0,pending:0,fabledSpecies:0,tiers:[0,0,0,0,0]};
+    var seenKeys={},seenRows={},seenResources={},seenFabled={};
+    list.forEach(function(a){
+      if(isPending(a)){result.pending++;return;}
+      var info=managerInfo(a), rows=managerRows(a,selectedOnly), config=info.configSpecies;
+      rows.forEach(function(r){
+        var nameId=config+"|"+r.displayKey;
+        if(!seenKeys[nameId]) {seenKeys[nameId]=1;result.keys++;}
+        var rowId=nameId+"|"+r.rarity+"|"+r.indices.join(",");
+        if(!seenRows[rowId]) {seenRows[rowId]=1;result.tiers[r.rarity]++;}
+        r.variants.forEach(function(v){
+          var resourceId=manager.source.configSHA256+"|"+v.node_offset;
+          if(!seenResources[resourceId]) {seenResources[resourceId]=1;result.resources++;}
+        });
+        if(r.rarity===4 && !seenFabled[config]) {seenFabled[config]=1;result.fabledSpecies++;}
+      });
+    });
+    return result;
+  }
+  function tierStrip(stats) {
+    return '<div class="manager-tier-strip">'+["common","uncommon","rare","veryrare","fabled"].map(function(id,i){return '<span class="manager-tier-total" data-tier="'+i+'"><i class="dot dot-manager-'+id+'" aria-hidden="true"></i>'+esc(managerTierText(id))+' <b>'+stats.tiers[i]+'</b></span>';}).join("")+'<span class="manager-tier-total">'+esc(T("rarityPending"))+' <b>'+stats.pending+'</b> '+esc(LANG==="en"?"species":"物种")+'</span><span class="manager-stat-note">'+esc(LANG==="en"?"Tier counts: configuration × display-key × tier groups; shared map records are deduplicated, and numbered resources are not additional names.":"档位计数按“配置 × 显示键 × 等级”分组；共享地图记录去重，同名资源不额外计作毛色名称。")+'</span></div>';
+  }
+  // Read-only diagnostics for reproducible acceptance, using the same runtime projection.
+  window.CATALOG_MANAGER_CHECK={rows:function(code){var a=data.find(function(a){return a.code===code;});return a?managerRows(a,true):[];},stats:function(){return managerStats(filtered(),true);}};
+
   /* ---- 渲染 ---- */
   function renderHeroStats() {
-    var rareCount = 0, goCount = 0;
-    data.forEach(function (a) {
-      rareCount += furNameCount(a);
-      if (hasGO(a)) goCount++;
-    });
-    var items = [
-      [data.length, T("stSpecies")],
-      [allFamilies().length, T("stFamilies")],
-      [allMaps().length, T("stMaps")],
-      [rareCount, T("stRareEntries")],
-      [goCount, T("stGOSpecies")]
-    ];
-    el.heroStats.innerHTML = items.map(function (it) {
-      return '<div class="stat"><b>' + it[0] + '</b><span>' + it[1] + '</span></div>';
-    }).join("");
+    var stats=managerStats(data,false);
+    var items=[[data.length,T("stSpecies")],[allFamilies().length,T("stFamilies")],[allMaps().length,T("stMaps")],[stats.keys,T("stRareEntries")],[stats.pending,T("stPendingSpecies")]];
+    el.heroStats.innerHTML=items.map(function(it){return '<div class="stat"><b>'+it[0]+'</b><span>'+esc(it[1])+'</span></div>';}).join("");
   }
-
   function renderSummary(list) {
-    var maps = unique(list.reduce(function (acc, a) { return acc.concat(mapsOf(a)); }, []));
-    var rareCount = 0, goCount = 0;
-    list.forEach(function (a) {
-      rareCount += furNameCount(a);
-      if (hasGO(a)) goCount++;
-    });
-    var items = [
-      [list.length, T("sumCurrent")],
-      [rareCount, T("sumRare")],
-      [maps.length, T("sumMaps")],
-      [goCount, T("sumGO")]
-    ];
-    el.summaryStrip.innerHTML = items.map(function (it) {
-      return '<div class="summary-item"><b>' + it[0] + '</b><span>' + it[1] + '</span></div>';
-    }).join("");
+    var maps=unique(list.reduce(function(acc,a){return acc.concat(mapsOf(a));},[])),stats=managerStats(list,true);
+    var items=[[list.length,T("sumCurrent")],[stats.keys,T("sumRare")],[stats.resources,T("sumResources")],[maps.length,T("sumMaps")]];
+    el.summaryStrip.innerHTML=items.map(function(it){return '<div class="summary-item"><b>'+it[0]+'</b><span>'+esc(it[1])+'</span></div>';}).join("")+tierStrip(stats);
   }
 
   function renderBars(container, entries, total, active, onPick, labelFn) {
@@ -662,8 +744,8 @@
     }).join("");
     var count=e.entries.reduce(function(n,item){return n+item.variants.length;},0);
     var limits=en
-      ? "Configuration fields verified against original game-file bytes. Frequency reference labels remain separate: enum values do not establish spawn percentages or the Trophy Manager's five filter tiers. Numbered resources sharing a display key are not additional color names. Missing path properties do not establish runtime sex restrictions; model appearance and runtime overrides remain unverified."
-      : "配置字段已与游戏文件原始字节核对。网页频率参考与文件枚举分列：枚举不代表生成百分比，也不等同于管理器五档筛选。同显示键的编号资源不另算新毛色名称；路径属性缺失不等于运行时性别禁用，模型外观与运行时覆盖仍未核。";
+      ? "Configuration fields verified against original game-file bytes. Frequency reference labels remain separate: enum values alone do not establish spawn percentages or the Trophy Manager's five filter tiers; the main list additionally applies the verified resource flag and native bridge. Numbered resources sharing a display key are not additional color names. Missing path properties do not establish runtime sex restrictions; model appearance and runtime overrides remain unverified."
+      : "配置字段已与游戏文件原始字节核对。网页频率参考与文件枚举分列：枚举不代表生成百分比；主列表结合已核资源标志与程序转换分支生成管理器五档，未绑定记录不推定。同显示键的编号资源不另算新毛色名称；路径属性缺失不等于运行时性别禁用，模型外观与运行时覆盖仍未核。";
     return '<details class="resource-evidence config-evidence"><summary>'+esc(en?"Game file grades & resource variants":"游戏文件等级与资源变体")+' · '+e.entries.length+' / '+count+'</summary><p>'+esc(en?"Source: ":"来源：")+esc(e.source.file)+'</p><p>'+esc(limits)+'</p><div class="config-entries">'+entries+'</div></details>';
   }
   function configInlineMarkup(a,index) {
@@ -685,14 +767,14 @@
       return '<tr data-config-index="'+v.index+'"><td>'+v.index+'</td><td><strong>'+esc(name+suffix)+'</strong><details><summary>'+esc(en ? "Display key / model paths" : "显示键／模型路径")+'</summary><code class="config-code">'+esc(v.display_key)+'</code><code class="config-code">hash '+esc(loc.hash)+'</code>'+paths+'</details></td><td data-label="'+escAttr(en ? "Config rarity: " : "配置稀有度：")+'">'+esc(en?tier.en:tier.zh)+'<br><code>'+v.type_rarity+'</code></td></tr>';
     }).join("");
     var limits=en
-      ? "Verified: configuration index, male/female path fields, display keys, same-hash EN/ZH text, type_rarity and the game EXE enum-label branches. Not verified: runtime overrides, full caller data-flow or the actual 02 patterns. The four config values are not equated to the Trophy Manager's five filter tiers."
-      : "已核：配置编号、雄雌路径字段、显示键、同哈希中英词、type_rarity及游戏程序枚举显示分支。未核：运行时覆盖、完整调用数据流、02实际花纹；四值配置枚举不等同于管理器五档筛选。";
+      ? "Verified: configuration index, male/female path fields, display keys, same-hash EN/ZH text, type_rarity and the game EXE enum-label branches. Not verified: runtime overrides, full caller data-flow or the actual 02 patterns. Raw config labels remain separate; the main list now applies the verified native bridge plus flag to produce the five manager tiers."
+      : "已核：配置编号、雄雌路径字段、显示键、同哈希中英词、type_rarity及游戏程序枚举显示分支。未核：运行时覆盖、完整调用数据流、02实际花纹；配置原词仍保留；主列表已按已核程序分支与资源标志计算管理器五档。";
     return '<details class="resource-evidence tiger-config"><summary>'+esc(en ? "Complete game configuration" : "完整游戏配置")+' ('+e.variants.length+')</summary><p>'+esc(en ? "Source: game32.arc / global/global_animal_types.blo; display text: game67.arc / settings/hp_settings/string_ids.stringlookup. Orange is Common and is excluded from the nine non-common variants." : "来源：game32.arc / global/global_animal_types.blo；显示词：game67.arc / settings/hp_settings/string_ids.stringlookup。橙色为常见，不计入九个非普通变体。")+'</p><table><colgroup><col style="width:10%"><col style="width:65%"><col style="width:25%"></colgroup><thead><tr><th>'+esc(en?"Index":"编号")+'</th><th>'+esc(en?"Display name / resource":"显示名称／资源")+'</th><th>'+esc(en?"Config rarity":"配置稀有度")+'</th></tr></thead><tbody>'+rows+'</tbody></table><p>'+esc(limits)+'</p></details>';
   }
 
   function tigerFurMarkup(a, r) {
     var m=r[2], name=rowFurName(a,r), secondary=LANG === "zh" ? '<span class="tiger-en">'+esc(m.en)+'</span>' : "";
-    return '<li class="tiger-fur-row" data-variant-index="'+m.index+'" data-rarity-id="'+m.rarityId+'"><span class="grade grade-'+(m.rarityId === "veryrare" ? "vr" : "r")+'">'+esc(gradeName(r[1]))+'</span><span class="tiger-fur-name"><strong>'+esc(name)+'</strong>'+secondary+'</span><span class="tiger-variant">'+esc((m.variantCode ? "02 · " : "")+"#"+m.index)+'</span></li>';
+    return '<li class="tiger-fur-row" data-variant-index="'+m.index+'" data-rarity-id="'+m.rarityId+'"><span class="grade grade-'+(m.rarityId === "veryrare" ? "vr" : "r")+'">'+esc(mainRarityText(r))+'</span><span class="tiger-fur-name"><strong>'+esc(name)+'</strong>'+secondary+'</span><span class="tiger-variant">'+esc((m.variantCode ? "02 · " : "")+"#"+m.index)+'</span></li>';
   }
 
   function renderList(list) {
@@ -705,10 +787,8 @@
     el.emptyState.hidden = true;
     var html = list.map(function (a) {
       var open = state.open[a.code] ? " open" : "";
-      var dots = a.rare.map(function (r) {
-        return '<i class="dot ' + (rarityId(r) === "veryrare" ? "dot-veryrare" : "dot-rare") + '" title="' + esc(rowFurName(a, r)) + (r[2] ? " #"+r[2].index : "") + " · " + esc(gradeName(r[1])) + '"></i>';
-      }).join("");
-      if (hasGO(a)) dots += '<i class="dot dot-go" title="' + esc(LANG === "en" ? "Has Great One fur" : "有传奇毛色") + '"></i>';
+      var dots=managerRows(a,true).map(function(r){return '<i class="dot dot-manager-'+r.rarityId+'" title="'+escAttr((LANG==="en"?r.en:r.zh)+" · "+managerTierText(r.rarityId))+'"></i>';}).join("");
+      if(isPending(a)) dots='<span class="manager-pending-chip">'+esc(T("rarityPending"))+'</span>';
       var mountChips = a.mounts.map(function (m) {
         return '<span class="mount-chip">' + esc(m[0]) + (m[1] ? '<span class="size-chip">' + esc(m[1]) + "</span>" : "") + "</span>";
       }).join("");
@@ -723,7 +803,7 @@
           : sx === "fu" ? '<span class="sex-tag" title="' + escAttr(LANG === "en" ? "Single source; unverified" : "单源,待互证") + '">♀?</span>'
           : sx === "mu" ? '<span class="sex-tag" title="' + escAttr(LANG === "en" ? "Single source; unverified" : "单源,待互证") + '">♂?</span>'
           : "";
-        return '<li>' + '<span class="grade grade-' + (r[1] === "极稀有" ? "vr" : "r") + '" title="' + escAttr(a.configEvidence ? (LANG === "en" ? "Web frequency reference; separate from game file enum" : "网页频率参考，与游戏文件枚举分列") : "") + '">' + esc(gradeName(r[1])) + "</span>" + esc(furName(a, r[0])) + sxTag + configInlineMarkup(a,ri) + (a.resourceEvidence ? '<span class="views-note" title="' + escAttr(LANG === "en" ? "Reference name and rarity; not game-verified" : "参考名称与稀有度，非游戏核证结论") + '"> *</span>' : "") + "</li>";
+        return '<li>' + '<span class="grade grade-' + (r[1] === "极稀有" ? "vr" : "r") + '" title="' + escAttr(LANG === "en" ? "Web frequency reference; separate from game file enum" : "网页频率参考，与游戏文件枚举分列") + '">' + esc(mainRarityText(r)) + "</span>" + esc(furName(a, r[0])) + sxTag + configInlineMarkup(a,ri) + (a.resourceEvidence ? '<span class="views-note" title="' + escAttr(LANG === "en" ? "Reference name and rarity; not game-verified" : "参考名称与稀有度，非游戏核证结论") + '"> *</span>' : "") + "</li>";
       }).join("");
       var goLis = (a.go || []).map(function (g) {
         var name = LANG === "en" ? g.en : (g.z || g.en);
@@ -732,6 +812,11 @@
           : g.sx === "f" ? '<span class="sex-tag">♀</span>'
           : g.sx === "mi" ? '<span class="sex-tag" title="' + escAttr(LANG === "en" ? "Inferred from antlers/tusks — not officially stated" : "由角/牙推断雄性,非官方性别陈述") + '">♂*</span>'
           : '<span class="sex-tag sex-unknown">' + (LANG === "en" ? "sex TBD" : "性别待核") + '</span>';
+        if(a.code==="tahr" && g.sx==="m") {
+          sxTag='<span class="sex-tag legacy-sex-reference" data-source="legacy-reference" title="'+
+            escAttr(LANG==="en" ? "Legacy reference; male-only runtime restriction is not proven by gender=1." : "旧参考标记；gender=1尚不足以证明实机仅限雄性。")+'">'+
+            esc(LANG==="en" ? "Male (reference)" : "雄性（参考）")+'</span>';
+        }
         var viewsTxt = viewsLabel(g.views);
         var views = viewsTxt ? ' <span class="views-note">(' + esc(viewsTxt) + ")</span>" : "";
         return '<li><span class="grade grade-go">' + esc(T("lgGoShort")) + '</span>' + esc(name) + untr + sxTag + views + "</li>";
@@ -761,7 +846,7 @@
         "</div>" +
         '<div class="detail">' +
           '<div class="detail-grid">' +
-            '<div'+(a.gameFurEvidence ? ' class="tiger-furs"' : '')+'><h3>' + esc(a.gameFurEvidence ? (LANG === "en" ? "Non-common resource variants" : "非普通资源变体") : T("dRareFurs")) + " · " + furRowCount(a) + "</h3>" + (a.gameFurEvidence ? '<p class="tiger-count">'+furNameCount(a)+' '+esc(LANG === "en" ? 'display-name keys; 02 shares its base display key, not a new name. Config rarity uses verified game text; filters retain Rare / Very Rare IDs.' : '个显示名称键；02与基础变体共用显示键，不另算新名称。配置等级采用游戏译词，筛选仍使用稀有／极稀有ID。')+'</p>' : '') + '<ul'+(a.gameFurEvidence ? ' class="tiger-fur-list"' : '')+'>' + rareLis + "</ul>" + (goLis ? "<h3>" + esc(T("dGoFurs")) + " · " + (a.go||[]).length + "</h3><ul>" + goLis + "</ul><p class='views-note'>" + esc(goNameEvidenceNote(a)) + "</p>" : "") + "</div>" +
+            '<div class="manager-furs">'+managerFurMarkup(a)+'<details class="legacy-references"><summary>'+esc(T("referenceDetails"))+'</summary><h3>'+esc(T("dRareFurs"))+' · '+referenceRowCount(a)+'</h3><ul'+(a.gameFurEvidence?' class="tiger-fur-list"':'')+'>'+rareLis+'</ul>'+(goLis?'<h3>'+esc(T("dGoFurs"))+' · '+(a.go||[]).length+'</h3><ul>'+goLis+'</ul><p class="views-note">'+esc(goNameEvidenceNote(a))+'</p>':'')+'</details></div>'+
             "<div><h3>" + esc(T("dReserves")) + "</h3><ul>" + mapLis + "</ul></div>" +
             "<div><h3>" + esc(T("dMounts")) + "</h3>" + detailMount + "</div>" +
           "</div>" +
@@ -795,7 +880,7 @@
     });
     el.btnLang.textContent = LANG === "en" ? "中文" : "EN";
     document.documentElement.lang = LANG === "en" ? "en" : "zh-CN";
-    document.title = LANG === "en" ? "theHunter: Call of the Wild — Rare Fur & Mount Catalog" : "猎人：荒野的呼唤 · 全物种稀有毛色图鉴";
+    document.title = LANG === "en" ? "theHunter: Call of the Wild — Fur Tiers & Mount Catalog" : "猎人：荒野的呼唤 · 全物种毛色等级图鉴";
   }
 
   /* ---- 状态与联动 ---- */

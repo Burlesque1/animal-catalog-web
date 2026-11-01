@@ -7,9 +7,9 @@
 <link rel="apple-touch-icon" href="assets/favicon.png">
 <meta name="google-site-verification" content="28jOzchfS-WtsAz9R86f2Y_HV2xLQfrnDylIVcfvE4c" />
 <meta name="description" content="theHunter: Call of the Wild — complete catalog of all species, rare & very rare fur types, reserve maps, and Matt mount blueprints. 全物种稀有毛色图鉴：稀有毛色、地图分布、Matt 底座蓝图。">
-<title>theHunter: Call of the Wild — Rare Fur &amp; Mount Catalog</title>
+<title>theHunter: Call of the Wild — Fur Tiers &amp; Mount Catalog</title>
 <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap">
-<link rel="stylesheet" href="styles.css?v=8ecf02379f8a">
+<link rel="stylesheet" href="styles.css?v=4de6af1dfbb4">
 </head>
 <body>
 
@@ -22,10 +22,12 @@
     <h1 class="hero-title" data-i18n="heroTitle">全物种稀有毛色图鉴</h1>
     <p class="hero-sub" data-i18n="heroSub">127 种动物 · 稀有毛色 · 地图分布 · Matt 底座蓝图 —— 一站查清值得打的每一只</p>
     <div class="hero-stats" id="heroStats"></div>
-    <div class="hero-legend" aria-label="毛色图例">
-      <span class="hlg"><i class="dot dot-rare"></i><span data-i18n="lgRare">稀有毛色（0.1%–1%）</span></span>
-      <span class="hlg"><i class="dot dot-veryrare"></i><span data-i18n="lgVeryrare">极稀有毛色（&lt;0.1%）</span></span>
-      <span class="hlg"><i class="dot dot-go"></i><span data-i18n="lgGo">有 Great One 传奇毛色</span></span>
+    <div class="hero-legend" aria-label="管理器五档毛色图例">
+      <span class="hlg"><i class="dot dot-manager-common"></i><span data-i18n="rarityCommon">普通</span></span>
+      <span class="hlg"><i class="dot dot-manager-uncommon"></i><span data-i18n="rarityUncommon">少有</span></span>
+      <span class="hlg"><i class="dot dot-manager-rare"></i><span data-i18n="lgRare">稀有</span></span>
+      <span class="hlg"><i class="dot dot-manager-veryrare"></i><span data-i18n="lgVeryrare">罕见</span></span>
+      <span class="hlg"><i class="dot dot-manager-fabled"></i><span data-i18n="lgGo">珍稀</span></span>
     </div>
   </div>
 </header>
@@ -65,11 +67,14 @@
       <div class="rarity-field">
         <span class="filter-label" id="rarityLabel" data-i18n="lblRarity">稀有度</span>
         <details id="fRarity" class="rarity-dropdown">
-          <summary aria-labelledby="rarityLabel raritySummary" aria-controls="rarityMenu"><span id="raritySummary">全部稀有以上</span><span class="rarity-chevron" aria-hidden="true"></span></summary>
+          <summary aria-labelledby="rarityLabel raritySummary" aria-controls="rarityMenu"><span id="raritySummary">全部档位与待核</span><span class="rarity-chevron" aria-hidden="true"></span></summary>
           <div id="rarityMenu" class="rarity-menu" role="group" aria-labelledby="rarityLabel">
-            <label class="rarity-option"><input type="checkbox" value="rare" checked><i class="dot dot-rare" aria-hidden="true"></i><span data-i18n="rarityRare">稀有</span></label>
-            <label class="rarity-option"><input type="checkbox" value="veryrare" checked><i class="dot dot-veryrare" aria-hidden="true"></i><span data-i18n="rarityVeryrare">极稀有</span></label>
-            <label class="rarity-option"><input type="checkbox" value="go" checked><i class="dot dot-go" aria-hidden="true"></i><span data-i18n="rarityGO">传奇</span></label>
+            <label class="rarity-option"><input type="checkbox" value="common" checked><i class="dot dot-manager-common" aria-hidden="true"></i><span data-i18n="rarityCommon">普通</span></label>
+            <label class="rarity-option"><input type="checkbox" value="uncommon" checked><i class="dot dot-manager-uncommon" aria-hidden="true"></i><span data-i18n="rarityUncommon">少有</span></label>
+            <label class="rarity-option"><input type="checkbox" value="rare" checked><i class="dot dot-manager-rare" aria-hidden="true"></i><span data-i18n="rarityRare">稀有</span></label>
+            <label class="rarity-option"><input type="checkbox" value="veryrare" checked><i class="dot dot-manager-veryrare" aria-hidden="true"></i><span data-i18n="rarityVeryrare">罕见</span></label>
+            <label class="rarity-option"><input type="checkbox" value="fabled" checked><i class="dot dot-manager-fabled" aria-hidden="true"></i><span data-i18n="rarityFabled">珍稀</span></label>
+            <label class="rarity-option"><input type="checkbox" value="pending" checked><i class="dot dot-manager-pending" aria-hidden="true"></i><span data-i18n="rarityPending">绑定待核</span></label>
             <div class="rarity-actions"><button type="button" id="rarityAll" data-i18n="raritySelectAll">全选</button><button type="button" id="rarityClear" data-i18n="rarityClear">清空</button></div>
             <p class="rarity-help" data-i18n="rarityOr">可多选，所选等级取“或”。</p>
           </div>
@@ -140,12 +145,13 @@
   <div class="foot-inner">
     <p data-i18n="footSrc">数据源：gameslikefinder《Rare Fur Types List》（2026-06-24，20 张地图）· thewildregister.com / TacMaps（骆马）· Matt 底座蓝图来自 thehuntercotw.wordpress.com（2025-07-06）。</p>
     <p data-i18n="footClasses">Animal types follow the four Trophy Manager groups. Animal Class uses public reference data, not trophy difficulty or medals; unresolved records remain unverified.</p>
-    <p data-i18n="footNote">更新于2026-10-26。游戏二级分类筛选尚未提供；性别标签沿用现有参考资料。</p>
+    <p data-i18n="footNote">本地核验预览，未发布；原入口状态未决，核验只适用本快照。</p>
   </div>
 </footer>
 
-<script src="data.js?v=878ef57801be"></script>
+<script src="data.js?v=46a4ef8f5345"></script>
 <script src="game-filters.js?v=cbb3968699f3"></script>
-<script src="app.js?v=0c92a9c625a3"></script>
+<script src="manager-rarity.js?v=05a47f0da29a"></script>
+<script src="app.js?v=0b4d5f83a26d"></script>
 </body>
 </html>

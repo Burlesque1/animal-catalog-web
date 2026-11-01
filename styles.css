@@ -597,3 +597,46 @@ body {
  .summary-strip{grid-template-columns:repeat(2,minmax(0,1fr));}
  .detail-grid{grid-template-columns:minmax(0,1fr);}
 }
+
+/* ===== Manager five-tier source projection; semantic colors are independent of reference badges ===== */
+.dot-manager-common{background:var(--mist);}
+.dot-manager-uncommon{background:var(--moss);}
+.dot-manager-rare{background:var(--gold);}
+.dot-manager-veryrare{background:var(--violet);}
+.dot-manager-fabled{background:var(--go);border-radius:3px;}
+.manager-grade-common{background:var(--mist);color:var(--ink);}
+.manager-grade-uncommon{background:var(--moss);color:var(--ink);}
+.manager-grade-rare{background:var(--gold);color:var(--ink);}
+.manager-grade-veryrare{background:var(--violet);}
+.manager-grade-fabled{background:var(--go);color:var(--ink);}
+.manager-furs{min-width:0;}
+.manager-furs h3{font-size:14px;opacity:1;letter-spacing:0;text-transform:none;}
+.manager-count,.manager-method,.manager-pending{font-size:14px;line-height:1.65;margin:6px 0 12px;overflow-wrap:anywhere;}
+.detail .manager-fur-list{gap:0;}
+.detail .manager-fur-row{display:grid;grid-template-columns:85px minmax(0,1fr);gap:6px 10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--paper-line);font-size:14px;}
+.manager-fur-row .grade{font-size:13px;text-align:center;align-self:start;}
+.manager-fur-name{min-width:0;overflow-wrap:anywhere;}
+.manager-en{display:block;font-size:14px;color:rgba(30,43,36,.7);}
+.manager-index{grid-column:2;font-size:13px;overflow-wrap:anywhere;}
+.manager-resources{grid-column:1/-1;min-width:0;}
+.manager-resources summary,.legacy-references>summary{min-height:44px;display:flex;align-items:center;font-size:14px;cursor:pointer;}
+.manager-resources li{display:block!important;font-size:14px;padding:8px 0;}
+.manager-path,.manager-key{display:block;white-space:normal;overflow-wrap:anywhere;font-size:13px;}
+.manager-text-pending{display:block;font-size:13px;color:#75501b;}
+.manager-pending-chip{font-size:12px;border:1px dashed var(--moss);padding:2px 6px;}
+.legacy-references{margin:14px 0;border-top:1px solid var(--paper-line);}
+.legacy-references h3{margin-top:12px;}
+.manager-tier-strip{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:12px 20px;padding:10px 0;align-items:center;}
+.manager-tier-total{display:inline-flex;align-items:center;gap:6px;font-size:14px;}
+.manager-tier-total b{color:var(--paper);}
+.manager-stat-note{flex-basis:100%;font-size:13px;color:var(--mist);}
+@media(min-width:769px){
+ .animal-card .detail-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+ .detail-grid > .manager-furs{grid-column:1/-1;}
+ .detail .manager-fur-row{grid-template-columns:85px minmax(0,1fr) auto auto;gap:8px 12px;}
+ .manager-index{grid-column:3;max-width:160px;}
+ .manager-resources{grid-column:4;}
+ .manager-resources[open]{grid-column:1/-1;}
+ .manager-resources:not([open]) summary{min-height:30px;padding:2px 0;}
+ .manager-fur-row .grade{align-self:center;}
+}
